@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import FirebaseExample from "@/components/FirebaseExample";
 
 export default function Home() {
   return (
@@ -77,6 +78,11 @@ export default function Home() {
           <Button variant="outline" size="lg">
             Learn More
           </Button>
+        </div>
+
+        {/* Firebase Example Component */}
+        <div className="mt-12">
+          <FirebaseExample />
         </div>
       </div>
     </div>
