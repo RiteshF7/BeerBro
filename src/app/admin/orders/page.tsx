@@ -43,7 +43,11 @@ export default function OrdersPage() {
     {
       key: 'status' as keyof OrderWithId,
       label: 'Status',
-      render: (value: unknown) => <StatusBadge status={value as 'pending' | 'accepted' | 'rejected' | 'failed'} />,
+      render: (value: unknown) => {
+        const status = value as string;
+        if (!status) return <span className="text-gray-500">No status</span>;
+        return <StatusBadge status={status as 'pending' | 'accepted' | 'rejected' | 'failed'} />;
+      },
     },
     {
       key: 'createdAt' as keyof OrderWithId,

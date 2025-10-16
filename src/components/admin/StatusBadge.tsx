@@ -31,7 +31,11 @@ const statusConfig = {
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] || {
+    label: status,
+    variant: 'secondary' as const,
+    className: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
+  };
   
   return (
     <Badge variant={config.variant} className={config.className}>

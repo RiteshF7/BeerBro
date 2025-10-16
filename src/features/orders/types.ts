@@ -22,7 +22,7 @@ export const orderSchema = z.object({
   userName: z.string(),
   items: z.array(orderItemSchema),
   total: z.number().min(0),
-  status: z.enum(ORDER_STATUSES),
+  status: z.enum(ORDER_STATUSES).default('pending'),
   shippingAddress: addressSchema,
 });
 
