@@ -72,11 +72,11 @@ export default function Home() {
         </div>
 
         <div className="mt-12 text-center">
-          <Button size="lg" className="mr-4">
-            Get Started
+          <Button size="lg" className="mr-4" asChild>
+            <a href="/admin">Admin Console</a>
           </Button>
-          <Button variant="outline" size="lg">
-            Learn More
+          <Button variant="outline" size="lg" asChild>
+            <a href="/login">Login</a>
           </Button>
         </div>
 

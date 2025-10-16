@@ -31,7 +31,7 @@ try {
     db = getFirestore(app);
     storage = getStorage(app);
   }
-} catch (error) {
+} catch {
   console.warn('Firebase initialization failed. Please check your environment variables.');
 }
 
