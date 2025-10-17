@@ -5,6 +5,7 @@ import { Badge } from '@/lib/common/ui/badge';
 import { Button } from '@/lib/common/ui/button';
 import { X, Menu } from 'lucide-react';
 import { useState } from 'react';
+import { Product } from '../services/products.service';
 
 export interface Category {
   id: string;
@@ -227,7 +228,7 @@ interface CategoryGridProps {
   showTitle?: boolean;
   onCategoryClick?: (category: Category) => void;
   layout?: 'grid' | 'sidebar';
-  products?: any[]; // Add products prop to calculate counts
+  products?: Product[]; // Add products prop to calculate counts
   selectedCategory?: string | null; // Add selected category prop
 }
 

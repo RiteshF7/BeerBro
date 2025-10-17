@@ -47,11 +47,11 @@ export async function GET(
     };
 
     return NextResponse.json(user);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching user:', error);
     
     // Handle permission errors gracefully
-    if (error.code === 'permission-denied') {
+    if (error instanceof Error && 'code' in error && error.code === 'permission-denied') {
       // Return a default user profile for permission-denied errors
       const { id: userId } = await params;
       const defaultUser = {
@@ -100,11 +100,11 @@ export async function POST(
     await setDoc(doc(db, USERS_COLLECTION, userId), userData);
     
     return NextResponse.json({ success: true }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating user:', error);
     
     // Handle permission errors gracefully
-    if (error.code === 'permission-denied') {
+    if (error instanceof Error && 'code' in error && error.code === 'permission-denied') {
       return NextResponse.json(
         { error: 'Permission denied. Please check your authentication.' },
         { status: 403 }
@@ -142,11 +142,11 @@ export async function PATCH(
     await updateDoc(docRef, updateData);
     
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating user:', error);
     
     // Handle permission errors gracefully
-    if (error.code === 'permission-denied') {
+    if (error instanceof Error && 'code' in error && error.code === 'permission-denied') {
       return NextResponse.json(
         { error: 'Permission denied. Please check your authentication.' },
         { status: 403 }

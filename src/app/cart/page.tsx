@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/lib/common/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/common/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/lib/common/ui/card';
 import { Badge } from '@/lib/common/ui/badge';
 import { Input } from '@/lib/common/ui/input';
 import { Label } from '@/lib/common/ui/label';
