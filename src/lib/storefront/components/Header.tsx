@@ -12,7 +12,8 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/lib/common/ui/dropdown-menu';
-import { Search, ShoppingCart, User, Menu, LogOut, Settings } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, LogOut, Settings, UserCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -27,6 +28,7 @@ interface HeaderProps {
 
 export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +96,10 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={() => router.push('/profile')}>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
@@ -106,7 +112,7 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => router.push('/login')}>
                 <User className="h-4 w-4 mr-2" />
                 Sign In
               </Button>

@@ -135,9 +135,11 @@ function HomeContent() {
             <Button size="lg" asChild>
               <a href="/admin">Admin Console</a>
             </Button>
-            <Button variant="outline" size="lg" asChild>
-              <a href="/login">Sign In</a>
-            </Button>
+            {!userProfile && (
+              <Button variant="outline" size="lg" asChild>
+                <a href="/login">Sign In</a>
+              </Button>
+            )}
           </div>
         </section>
       </main>
