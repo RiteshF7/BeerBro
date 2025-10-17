@@ -79,14 +79,15 @@ class ProductsService {
         q = query(q, where('category', '==', filters.category));
       }
 
-      if (filters?.inStock !== undefined) {
-        // Handle both inStock boolean and status string fields
-        if (filters.inStock) {
-          q = query(q, where('status', '==', 'active'));
-        } else {
-          q = query(q, where('status', '!=', 'active'));
-        }
-      }
+      // Note: We'll filter inStock on the client side to avoid index requirements
+      // if (filters?.inStock !== undefined) {
+      //   // Handle both inStock boolean and status string fields
+      //   if (filters.inStock) {
+      //     q = query(q, where('status', '==', 'active'));
+      //   } else {
+      //     q = query(q, where('status', '!=', 'active'));
+      //   }
+      // }
 
       if (filters?.isOnSale !== undefined) {
         q = query(q, where('isOnSale', '==', filters.isOnSale));
@@ -108,7 +109,7 @@ class ProductsService {
       console.log('Query snapshot size:', querySnapshot.size);
       console.log('Raw documents:', querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
       
-      return querySnapshot.docs.map(doc => {
+      let products = querySnapshot.docs.map(doc => {
         const data = doc.data();
         const transformedProduct = {
           id: doc.id,
@@ -125,6 +126,13 @@ class ProductsService {
         console.log('Transformed product:', transformedProduct);
         return transformedProduct;
       }) as Product[];
+
+      // Apply client-side filtering for inStock to avoid index requirements
+      if (filters?.inStock !== undefined) {
+        products = products.filter(product => product.inStock === filters.inStock);
+      }
+
+      return products;
     } catch (error) {
       console.error('Error fetching products:', error);
       return [];

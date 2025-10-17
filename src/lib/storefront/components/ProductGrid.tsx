@@ -8,6 +8,28 @@ import { cartService } from '../services/cart.service';
 import { Product } from '../services/products.service';
 import { useState, useEffect } from 'react';
 
+// Placeholder images for different product categories
+const getProductPlaceholderImage = (category: string): string => {
+  const categoryLower = category.toLowerCase();
+  
+  if (categoryLower.includes('beer')) {
+    return 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=400&fit=crop&q=80';
+  } else if (categoryLower.includes('wine')) {
+    return 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=400&fit=crop&q=80';
+  } else if (categoryLower.includes('spirit') || categoryLower.includes('whiskey') || categoryLower.includes('vodka')) {
+    return 'https://images.unsplash.com/photo-1551538827-9c037bd4df7b?w=400&h=400&fit=crop&q=80';
+  } else if (categoryLower.includes('cocktail')) {
+    return 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=400&fit=crop&q=80';
+  } else if (categoryLower.includes('non-alcoholic') || categoryLower.includes('mocktail')) {
+    return 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=400&fit=crop&q=80';
+  } else if (categoryLower.includes('accessor')) {
+    return 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop&q=80';
+  } else {
+    // Default placeholder
+    return 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop&q=80';
+  }
+};
+
 interface ProductGridProps {
   products: Product[];
   layout?: 'grid' | 'horizontal';
@@ -18,6 +40,8 @@ interface ProductGridProps {
 // ProductCard component for individual product display
 function ProductCard({ product }: { product: Product }) {
   const [cartQuantity, setCartQuantity] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = cartService.subscribe(() => {
@@ -25,6 +49,17 @@ function ProductCard({ product }: { product: Product }) {
     });
     return unsubscribe;
   }, [product.id]);
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoading(false);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const imageSrc = imageError || !product.image ? getProductPlaceholderImage(product.category) : product.image;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -63,10 +98,19 @@ function ProductCard({ product }: { product: Product }) {
     <Card className="group hover:shadow-lg transition-shadow">
       <CardHeader className="p-0">
         <div className="relative">
+          {imageLoading && (
+            <div className="w-full h-48 bg-gray-200 rounded-t-lg animate-pulse flex items-center justify-center">
+              <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+            </div>
+          )}
           <img
-            src={product.image}
+            src={imageSrc}
             alt={product.name}
-            className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-200"
+            className={`w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-200 ${
+              imageLoading ? 'hidden' : 'block'
+            }`}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
           />
           <div className="absolute top-2 left-2 flex flex-col space-y-1">
             {product.isNew && (
@@ -97,9 +141,9 @@ function ProductCard({ product }: { product: Product }) {
             {product.description}
           </p>
           <div className="flex items-center space-x-1">
-            {renderStars(product.rating)}
+            {renderStars(product.rating || 4.0)}
             <span className="text-sm text-gray-500">
-              ({product.reviewCount})
+              ({product.reviewCount || 0})
             </span>
           </div>
           <div className="flex items-center space-x-2">
@@ -165,6 +209,8 @@ function ProductCard({ product }: { product: Product }) {
 // Horizontal ProductCard component
 function HorizontalProductCard({ product }: { product: Product }) {
   const [cartQuantity, setCartQuantity] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = cartService.subscribe(() => {
@@ -172,6 +218,17 @@ function HorizontalProductCard({ product }: { product: Product }) {
     });
     return unsubscribe;
   }, [product.id]);
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoading(false);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const imageSrc = imageError || !product.image ? getProductPlaceholderImage(product.category) : product.image;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -210,10 +267,19 @@ function HorizontalProductCard({ product }: { product: Product }) {
     <Card className="min-w-[280px] flex-shrink-0">
       <CardHeader className="p-0">
         <div className="relative">
+          {imageLoading && (
+            <div className="w-full h-48 bg-gray-200 rounded-t-lg animate-pulse flex items-center justify-center">
+              <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+            </div>
+          )}
           <img
-            src={product.image}
+            src={imageSrc}
             alt={product.name}
-            className="w-full h-48 object-cover rounded-t-lg"
+            className={`w-full h-48 object-cover rounded-t-lg ${
+              imageLoading ? 'hidden' : 'block'
+            }`}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
           />
           <div className="absolute top-2 left-2 flex flex-col space-y-1">
             {product.isNew && (
@@ -244,9 +310,9 @@ function HorizontalProductCard({ product }: { product: Product }) {
             {product.description}
           </p>
           <div className="flex items-center space-x-1">
-            {renderStars(product.rating)}
+            {renderStars(product.rating || 4.0)}
             <span className="text-sm text-gray-500">
-              ({product.reviewCount})
+              ({product.reviewCount || 0})
             </span>
           </div>
           <div className="flex items-center space-x-2">
