@@ -95,11 +95,17 @@ export function OrderDetailsDialog({
               Shipping Address
             </h3>
             <div className="p-3 bg-gray-50 rounded-md">
-              <p>{order.shippingAddress.street}</p>
-              <p>
-                {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
-              </p>
-              <p>{order.shippingAddress.country}</p>
+              {order.shippingAddress ? (
+                <>
+                  <p>{order.shippingAddress.street}</p>
+                  <p>
+                    {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
+                  </p>
+                  <p>{order.shippingAddress.country}</p>
+                </>
+              ) : (
+                <p className="text-gray-500 italic">No shipping address provided</p>
+              )}
             </div>
           </div>
 

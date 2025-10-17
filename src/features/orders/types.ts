@@ -30,8 +30,9 @@ export type OrderFormData = z.infer<typeof orderSchema>;
 export type OrderItem = z.infer<typeof orderItemSchema>;
 export type Address = z.infer<typeof addressSchema>;
 
-export interface OrderWithId extends OrderFormData {
+export interface OrderWithId extends Omit<OrderFormData, 'shippingAddress'> {
   id: string;
   createdAt: Date;
   updatedAt: Date;
+  shippingAddress?: Address;
 }
