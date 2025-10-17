@@ -1,5 +1,5 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 
@@ -35,7 +35,13 @@ try {
   console.warn('Firebase initialization failed. Please check your environment variables.');
 }
 
+// Initialize Google Auth Provider
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
 // Initialize Firebase services
-export { auth, db, storage };
+export { auth, db, storage, googleProvider };
 
 export default app;

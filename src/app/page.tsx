@@ -1,22 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/lib/storefront/components/Header';
 import { ProductGrid } from '@/lib/storefront/components/ProductGrid';
 import { CategoryGrid } from '@/lib/storefront/components/CategoryGrid';
+import { AuthWrapper } from '@/lib/storefront/components/AuthWrapper';
 import { sampleProducts, sampleCategories } from '@/lib/storefront/data/sampleData';
+import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Button } from "@/lib/common/ui/button";
 
-export default function Home() {
+function HomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(sampleProducts);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  // Mock user data
-  const user = {
-    name: 'John Doe',
-    email: 'john@example.com',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
-  };
+  useEffect(() => {
+    const unsubscribe = authService.subscribe((state) => {
+      if (state.profile) {
+        setUserProfile(state.profile);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -39,11 +45,26 @@ export default function Home() {
     setFilteredProducts(filtered);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await authService.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   // Get featured products (first 4)
   const featuredProducts = sampleProducts.slice(0, 4);
   
   // Get new arrivals (last 4)
   const newArrivals = sampleProducts.slice(-4);
+
+  // Prepare user data for header
+  const user = userProfile ? {
+    name: userProfile.displayName,
+    email: userProfile.email,
+    avatar: userProfile.photoURL
+  } : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,6 +72,7 @@ export default function Home() {
         onSearch={handleSearch}
         cartItems={3}
         user={user}
+        onSignOut={handleSignOut}
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -120,5 +142,13 @@ export default function Home() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <AuthWrapper>
+      <HomeContent />
+    </AuthWrapper>
   );
 }
