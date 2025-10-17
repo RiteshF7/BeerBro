@@ -1,0 +1,9 @@
+# Firebase Configuration for Vercel Deployment
+# Copy these values to Vercel Environment Variables
+
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyCva9OrKnu9UhWXmjJClVnNOeD5hgyfP3g
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=pleasebringmebooze.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=pleasebringmebooze
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=pleasebringmebooze.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=610788097923
+NEXT_PUBLIC_FIREBASE_APP_ID=1:610788097923:web:c5a63159312eac8af400b6

@@ -13,6 +13,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || 'demo-app-id',
 };
 
+// Validate Firebase configuration
+const isFirebaseConfigured = () => {
+  return (
+    firebaseConfig.apiKey !== 'demo-api-key' &&
+    firebaseConfig.projectId !== 'demo-project' &&
+    firebaseConfig.authDomain !== 'demo-project.firebaseapp.com'
+  );
+};
+
 // Initialize Firebase only if we have valid configuration
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
@@ -20,8 +29,9 @@ let db: Firestore | null = null;
 let storage: FirebaseStorage | null = null;
 
 try {
-  if (getApps().length === 0 && firebaseConfig.apiKey !== 'demo-api-key') {
+  if (getApps().length === 0 && isFirebaseConfigured()) {
     app = initializeApp(firebaseConfig);
+    console.log('Firebase initialized successfully');
   } else if (getApps().length > 0) {
     app = getApps()[0];
   }
@@ -31,8 +41,9 @@ try {
     db = getFirestore(app);
     storage = getStorage(app);
   }
-} catch {
-  console.warn('Firebase initialization failed. Please check your environment variables.');
+} catch (error) {
+  console.error('Firebase initialization failed:', error);
+  console.warn('Please check your environment variables and Firebase configuration.');
 }
 
 // Initialize Google Auth Provider
@@ -42,6 +53,6 @@ googleProvider.setCustomParameters({
 });
 
 // Initialize Firebase services
-export { auth, db, storage, googleProvider };
+export { auth, db, storage, googleProvider, isFirebaseConfigured };
 
 export default app;
