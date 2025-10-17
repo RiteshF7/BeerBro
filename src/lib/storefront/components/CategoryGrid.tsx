@@ -92,7 +92,43 @@ const getCategoryImage = (categoryName: string): string => {
   }
 };
 
-// Category card component with hardcoded images
+// Category sidebar item component
+function CategorySidebarItem({ category, onCategoryClick }: { category: Category; onCategoryClick?: (category: Category) => void }) {
+  const imageSrc = getCategoryImage(category.name);
+  
+  return (
+    <div 
+      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200 group"
+      onClick={() => onCategoryClick?.(category)}
+    >
+      <div className="relative w-10 h-10 flex-shrink-0">
+        <img
+          src={imageSrc}
+          alt={category.name}
+          className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-200"
+        />
+        {category.isPopular && (
+          <Badge 
+            variant="destructive" 
+            className="absolute -top-1 -right-1 text-xs px-1 py-0.5"
+          >
+            Hot
+          </Badge>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="font-medium text-sm text-gray-900 group-hover:text-primary transition-colors">
+          {category.name}
+        </h3>
+        <p className="text-xs text-gray-500 truncate">
+          {category.productCount} products
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Category card component with hardcoded images (for grid layout)
 function CategoryCard({ category, onCategoryClick }: { category: Category; onCategoryClick?: (category: Category) => void }) {
   // Always use hardcoded images for categories
   const imageSrc = getCategoryImage(category.name);
@@ -139,19 +175,80 @@ interface CategoryGridProps {
   title?: string;
   showTitle?: boolean;
   onCategoryClick?: (category: Category) => void;
+  layout?: 'grid' | 'sidebar';
 }
 
 export function CategoryGrid({ 
   categories, 
   title = 'Categories',
   showTitle = true,
-  onCategoryClick 
+  onCategoryClick,
+  layout = 'grid'
 }: CategoryGridProps) {
   // Use hardcoded categories instead of Firestore categories
   const displayCategories = HARDCODED_CATEGORIES;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   console.log('CategoryGrid rendering with hardcoded categories:', displayCategories);
   
+  if (layout === 'sidebar') {
+    return (
+      <>
+        {/* Hamburger Menu Button */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="fixed top-4 left-4 z-50 bg-white shadow-lg"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        {/* Sidebar Overlay */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <div className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+          <div className="p-6">
+            {/* Sidebar Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Categories</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Categories List */}
+            <div className="space-y-2">
+              {displayCategories.map((category) => (
+                <CategorySidebarItem
+                  key={category.id}
+                  category={category}
+                  onCategoryClick={(cat) => {
+                    onCategoryClick?.(cat);
+                    setSidebarOpen(false); // Close sidebar after selection
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+  
+  // Default grid layout
   return (
     <div className="w-full">
       {showTitle && (

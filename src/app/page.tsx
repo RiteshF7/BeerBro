@@ -240,13 +240,12 @@ function HomeContent() {
           </p>
         </div>
 
-        {/* Categories Section */}
-        <section className="mb-16">
-          <CategoryGrid 
-            categories={categories}
-            onCategoryClick={handleCategoryClick}
-          />
-        </section>
+        {/* Categories Section - Sidebar */}
+        <CategoryGrid 
+          categories={categories}
+          onCategoryClick={handleCategoryClick}
+          layout="sidebar"
+        />
 
         {/* Featured Products - Horizontal */}
         <section className="mb-16">
