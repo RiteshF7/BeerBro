@@ -32,14 +32,7 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
-const firebaseConfig = {
-  apiKey: "AIzaSyCva9OrKnu9UhWXmjJClVnNOeD5hgyfP3g",
-  authDomain: "pleasebringmebooze.firebaseapp.com",
-  projectId: "pleasebringmebooze",
-  storageBucket: "pleasebringmebooze.firebasestorage.app",
-  messagingSenderId: "610788097923",
-  appId: "1:610788097923:web:c5a63159312eac8af400b6"
-};
+
 #### How to Get Firebase Configuration Values
 
 1. Go to your [Firebase Console](https://console.firebase.google.com)
