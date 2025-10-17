@@ -17,6 +17,8 @@ function HomeContent() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [filtering, setFiltering] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -58,6 +60,8 @@ function HomeContent() {
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
+    setSelectedCategory(null); // Reset category selection when searching
+    
     if (query.trim() === '') {
       setFilteredProducts(products);
     } else {
@@ -73,13 +77,19 @@ function HomeContent() {
 
   const handleCategoryClick = async (category: { name: string; id: string }) => {
     try {
+      setFiltering(true);
+      setError(null);
+      setSearchQuery(''); // Clear search when selecting category
+      setSelectedCategory(category.id === 'all' ? null : category.name);
+      
       if (category.id === 'all') {
         // Show all products
         setFilteredProducts(products);
       } else {
-        // Filter by category
+        // Filter by category - use lowercase to match Firestore data
+        const firestoreCategoryName = category.name.toLowerCase();
         const categoryProducts = await productsService.getProducts({ 
-          category: category.name,
+          category: firestoreCategoryName,
           inStock: true 
         });
         setFilteredProducts(categoryProducts);
@@ -87,6 +97,8 @@ function HomeContent() {
     } catch (err) {
       console.error('Error filtering by category:', err);
       setError('Failed to filter products. Please try again.');
+    } finally {
+      setFiltering(false);
     }
   };
 
@@ -245,6 +257,8 @@ function HomeContent() {
           categories={categories}
           onCategoryClick={handleCategoryClick}
           layout="sidebar"
+          products={products}
+          selectedCategory={selectedCategory}
         />
 
         {/* Featured Products - Horizontal */}
@@ -268,10 +282,22 @@ function HomeContent() {
         {/* All Products - Grid */}
         <section className="mb-12 sm:mb-16">
           <ProductGrid 
-            products={filteredProducts}
+            products={filtering ? [] : filteredProducts}
             layout="grid"
-            title={searchQuery ? `Search Results for "${searchQuery}"` : "All Products"}
+            title={
+              searchQuery 
+                ? `Search Results for "${searchQuery}"` 
+                : selectedCategory 
+                  ? `${selectedCategory} Products` 
+                  : "All Products"
+            }
           />
+          {filtering && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin mr-2" />
+              <span className="text-gray-600">Loading products...</span>
+            </div>
+          )}
         </section>
 
         {/* Call to Action */}

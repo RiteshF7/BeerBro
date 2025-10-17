@@ -93,12 +93,20 @@ const getCategoryImage = (categoryName: string): string => {
 };
 
 // Category sidebar item component
-function CategorySidebarItem({ category, onCategoryClick }: { category: Category; onCategoryClick?: (category: Category) => void }) {
+function CategorySidebarItem({ category, onCategoryClick, isSelected = false }: { 
+  category: Category; 
+  onCategoryClick?: (category: Category) => void;
+  isSelected?: boolean;
+}) {
   const imageSrc = getCategoryImage(category.name);
   
   return (
     <div 
-      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200 group"
+      className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors duration-200 group ${
+        isSelected 
+          ? 'bg-primary text-primary-foreground' 
+          : 'hover:bg-gray-100'
+      }`}
       onClick={() => onCategoryClick?.(category)}
     >
       <div className="relative w-10 h-10 flex-shrink-0">
@@ -117,10 +125,18 @@ function CategorySidebarItem({ category, onCategoryClick }: { category: Category
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-sm text-gray-900 group-hover:text-primary transition-colors">
+        <h3 className={`font-medium text-sm transition-colors ${
+          isSelected 
+            ? 'text-primary-foreground' 
+            : 'text-gray-900 group-hover:text-primary'
+        }`}>
           {category.name}
         </h3>
-        <p className="text-xs text-gray-500 truncate">
+        <p className={`text-xs truncate ${
+          isSelected 
+            ? 'text-primary-foreground/80' 
+            : 'text-gray-500'
+        }`}>
           {category.productCount} products
         </p>
       </div>
@@ -132,7 +148,6 @@ function CategorySidebarItem({ category, onCategoryClick }: { category: Category
 function CategoryCard({ category, onCategoryClick }: { category: Category; onCategoryClick?: (category: Category) => void }) {
   // Always use hardcoded images for categories
   const imageSrc = getCategoryImage(category.name);
-  console.log('CategoryCard rendering:', category.name, 'Image URL:', imageSrc);
   
   return (
     <Card 
@@ -176,6 +191,8 @@ interface CategoryGridProps {
   showTitle?: boolean;
   onCategoryClick?: (category: Category) => void;
   layout?: 'grid' | 'sidebar';
+  products?: any[]; // Add products prop to calculate counts
+  selectedCategory?: string | null; // Add selected category prop
 }
 
 export function CategoryGrid({ 
@@ -183,13 +200,30 @@ export function CategoryGrid({
   title = 'Categories',
   showTitle = true,
   onCategoryClick,
-  layout = 'grid'
+  layout = 'grid',
+  products = [],
+  selectedCategory = null
 }: CategoryGridProps) {
-  // Use hardcoded categories instead of Firestore categories
-  const displayCategories = HARDCODED_CATEGORIES;
+  // Use hardcoded categories but update product counts based on actual products
+  const displayCategories = HARDCODED_CATEGORIES.map(category => {
+    if (category.id === 'all') {
+      return {
+        ...category,
+        productCount: products.length
+      };
+    } else {
+      const categoryProducts = products.filter(product => 
+        product.category?.toLowerCase() === category.name.toLowerCase()
+      );
+      return {
+        ...category,
+        productCount: categoryProducts.length
+      };
+    }
+  });
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  console.log('CategoryGrid rendering with hardcoded categories:', displayCategories);
   
   if (layout === 'sidebar') {
     return (
@@ -235,6 +269,7 @@ export function CategoryGrid({
                 <CategorySidebarItem
                   key={category.id}
                   category={category}
+                  isSelected={selectedCategory === category.name || (selectedCategory === null && category.id === 'all')}
                   onCategoryClick={(cat) => {
                     onCategoryClick?.(cat);
                     setSidebarOpen(false); // Close sidebar after selection
