@@ -3,6 +3,9 @@ import withPWA from 'next-pwa';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    allowedDevOrigins: ['192.168.0.165', '172.23.96.1', 'localhost'],
+  },
 };
 
 export default withPWA({
