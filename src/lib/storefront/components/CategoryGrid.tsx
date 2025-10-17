@@ -2,22 +2,79 @@
 
 import { Card, CardContent } from '@/lib/common/ui/card';
 import { Badge } from '@/lib/common/ui/badge';
+import { Button } from '@/lib/common/ui/button';
+import { X, Menu } from 'lucide-react';
 import { useState } from 'react';
 
 export interface Category {
   id: string;
   name: string;
   description: string;
-  image: string;
+  image?: string; // Make image optional since it might not exist in Firestore
   productCount: number;
   isPopular?: boolean;
 }
 
-// Placeholder images for different categories
-const getPlaceholderImage = (categoryName: string): string => {
+// Hardcoded categories
+const HARDCODED_CATEGORIES: Category[] = [
+  {
+    id: 'all',
+    name: 'All Products',
+    description: 'Browse all available products',
+    productCount: 0, // Will be updated dynamically
+    isPopular: true,
+  },
+  {
+    id: 'beer',
+    name: 'Beer',
+    description: 'Craft and premium beers from around the world',
+    productCount: 0, // Will be updated dynamically
+    isPopular: true,
+  },
+  {
+    id: 'wine',
+    name: 'Wine',
+    description: 'Red, white, and sparkling wines',
+    productCount: 0,
+    isPopular: false,
+  },
+  {
+    id: 'spirits',
+    name: 'Spirits',
+    description: 'Whiskey, vodka, rum, and other premium spirits',
+    productCount: 0,
+    isPopular: true,
+  },
+  {
+    id: 'cocktails',
+    name: 'Cocktails',
+    description: 'Ready-to-drink cocktails and mixers',
+    productCount: 0,
+    isPopular: false,
+  },
+  {
+    id: 'non-alcoholic',
+    name: 'Non-Alcoholic',
+    description: 'Alcohol-free beverages and mocktails',
+    productCount: 0,
+    isPopular: false,
+  },
+  {
+    id: 'accessories',
+    name: 'Accessories',
+    description: 'Drinking accessories, glassware, and gifts',
+    productCount: 0,
+    isPopular: false,
+  },
+];
+
+// Hardcoded image URLs for different categories
+const getCategoryImage = (categoryName: string): string => {
   const categoryLower = categoryName.toLowerCase();
   
-  if (categoryLower.includes('beer')) {
+  if (categoryLower.includes('all products') || categoryLower.includes('all')) {
+    return 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=100&h=100&fit=crop&q=80';
+  } else if (categoryLower.includes('beer')) {
     return 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=100&h=100&fit=crop&q=80';
   } else if (categoryLower.includes('wine')) {
     return 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=100&h=100&fit=crop&q=80';
@@ -30,63 +87,44 @@ const getPlaceholderImage = (categoryName: string): string => {
   } else if (categoryLower.includes('accessor')) {
     return 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&q=80';
   } else {
-    // Default placeholder
+    // Default image for any other category
     return 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=100&h=100&fit=crop&q=80';
   }
 };
 
-// Category card component with image fallback
+// Category card component with hardcoded images
 function CategoryCard({ category, onCategoryClick }: { category: Category; onCategoryClick?: (category: Category) => void }) {
-  const [imageError, setImageError] = useState(false);
-  const [imageLoading, setImageLoading] = useState(true);
-  
-  const handleImageError = () => {
-    setImageError(true);
-    setImageLoading(false);
-  };
-  
-  const handleImageLoad = () => {
-    setImageLoading(false);
-  };
-  
-  const imageSrc = imageError || !category.image ? getPlaceholderImage(category.name) : category.image;
+  // Always use hardcoded images for categories
+  const imageSrc = getCategoryImage(category.name);
+  console.log('CategoryCard rendering:', category.name, 'Image URL:', imageSrc);
   
   return (
     <Card 
-      className="group cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
+      className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-0 shadow-sm bg-white"
       onClick={() => onCategoryClick?.(category)}
     >
-      <CardContent className="p-4 text-center">
-        <div className="space-y-3">
-          <div className="relative">
-            {imageLoading && (
-              <div className="w-16 h-16 mx-auto bg-gray-200 rounded-full animate-pulse flex items-center justify-center">
-                <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-              </div>
-            )}
+      <CardContent className="p-6 text-center">
+        <div className="space-y-4">
+          <div className="relative mx-auto w-20 h-20">
             <img
               src={imageSrc}
               alt={category.name}
-              className={`w-16 h-16 mx-auto object-cover rounded-full group-hover:scale-110 transition-transform duration-200 ${
-                imageLoading ? 'hidden' : 'block'
-              }`}
-              onError={handleImageError}
-              onLoad={handleImageLoad}
+              className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300 shadow-sm"
             />
             {category.isPopular && (
               <Badge 
                 variant="destructive" 
-                className="absolute -top-1 -right-1 text-xs"
+                className="absolute -top-2 -right-2 text-xs px-2 py-1"
               >
                 Hot
               </Badge>
             )}
           </div>
-          <div>
-            <h3 className="font-semibold text-sm text-gray-900 group-hover:text-primary transition-colors">
+          <div className="space-y-1">
+            <h3 className="font-semibold text-sm text-gray-900 group-hover:text-primary transition-colors duration-300">
               {category.name}
             </h3>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500">
               {category.productCount} products
             </p>
           </div>
@@ -109,13 +147,21 @@ export function CategoryGrid({
   showTitle = true,
   onCategoryClick 
 }: CategoryGridProps) {
+  // Use hardcoded categories instead of Firestore categories
+  const displayCategories = HARDCODED_CATEGORIES;
+  
+  console.log('CategoryGrid rendering with hardcoded categories:', displayCategories);
+  
   return (
-    <div className="space-y-6">
+    <div className="w-full">
       {showTitle && (
-        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900">{title}</h2>
+          <p className="text-gray-600 mt-2">Browse our selection by category</p>
+        </div>
       )}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {categories.map((category) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+        {displayCategories.map((category) => (
           <CategoryCard
             key={category.id}
             category={category}

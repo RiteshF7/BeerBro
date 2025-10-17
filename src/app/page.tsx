@@ -36,17 +36,14 @@ function HomeContent() {
         setError(null);
         
         console.log('Loading products from Firestore...');
-        const [productsData, categoriesData] = await Promise.all([
-          productsService.getProducts({ inStock: true }),
-          productsService.getCategories()
-        ]);
+        const productsData = await productsService.getProducts({ inStock: true });
         
         console.log('Products loaded:', productsData.length);
-        console.log('Categories loaded:', categoriesData.length);
         console.log('Sample product:', productsData[0]);
+        console.log('Using hardcoded categories instead of Firestore');
         
         setProducts(productsData);
-        setCategories(categoriesData);
+        setCategories([]); // Empty array since we use hardcoded categories
         setFilteredProducts(productsData);
       } catch (err) {
         console.error('Error loading data:', err);
@@ -74,13 +71,19 @@ function HomeContent() {
     }
   };
 
-  const handleCategoryClick = async (category: { name: string }) => {
+  const handleCategoryClick = async (category: { name: string; id: string }) => {
     try {
-      const categoryProducts = await productsService.getProducts({ 
-        category: category.name,
-        inStock: true 
-      });
-      setFilteredProducts(categoryProducts);
+      if (category.id === 'all') {
+        // Show all products
+        setFilteredProducts(products);
+      } else {
+        // Filter by category
+        const categoryProducts = await productsService.getProducts({ 
+          category: category.name,
+          inStock: true 
+        });
+        setFilteredProducts(categoryProducts);
+      }
     } catch (err) {
       console.error('Error filtering by category:', err);
       setError('Failed to filter products. Please try again.');
@@ -95,28 +98,70 @@ function HomeContent() {
     }
   };
 
-  // Get featured and new products
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-
-  useEffect(() => {
-    const loadFeaturedProducts = async () => {
-      try {
-        const [featured, newProducts] = await Promise.all([
-          productsService.getFeaturedProducts(),
-          productsService.getNewProducts()
-        ]);
-        setFeaturedProducts(featured);
-        setNewArrivals(newProducts);
-      } catch (err) {
-        console.error('Error loading featured products:', err);
-      }
-    };
-
-    if (products.length > 0) {
-      loadFeaturedProducts();
-    }
-  }, [products]);
+  // Hardcoded featured products
+  const featuredProducts: Product[] = [
+    {
+      id: 'featured-1',
+      name: 'Premium Craft IPA',
+      description: 'Award-winning IPA with tropical fruit notes and a crisp finish',
+      price: 15.99,
+      originalPrice: 18.99,
+      image: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=400&fit=crop&q=80',
+      category: 'Beer',
+      rating: 4.8,
+      reviewCount: 156,
+      inStock: true,
+      isOnSale: true,
+      isNew: false,
+      stockQuantity: 25,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: ['craft', 'ipa', 'award-winning'],
+      alcoholContent: 6.5,
+      volume: 355,
+      brand: 'Craft Masters',
+    },
+    {
+      id: 'featured-2',
+      name: 'Vintage Cabernet Sauvignon',
+      description: 'Rich and full-bodied red wine with notes of blackcurrant and oak',
+      price: 29.99,
+      image: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=400&fit=crop&q=80',
+      category: 'Wine',
+      rating: 4.7,
+      reviewCount: 89,
+      inStock: true,
+      isOnSale: false,
+      isNew: false,
+      stockQuantity: 15,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: ['vintage', 'cabernet', 'premium'],
+      alcoholContent: 13.5,
+      volume: 750,
+      brand: 'Vineyard Estates',
+    },
+    {
+      id: 'featured-3',
+      name: 'Single Malt Whiskey 18yr',
+      description: 'Aged 18 years in oak barrels for exceptional smoothness and complexity',
+      price: 129.99,
+      image: 'https://images.unsplash.com/photo-1551538827-9c037bd4df7b?w=400&h=400&fit=crop&q=80',
+      category: 'Spirits',
+      rating: 4.9,
+      reviewCount: 67,
+      inStock: true,
+      isOnSale: false,
+      isNew: false,
+      stockQuantity: 8,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: ['single-malt', 'aged', 'premium'],
+      alcoholContent: 40.0,
+      volume: 700,
+      brand: 'Highland Distillery',
+    },
+  ];
 
   // Prepare user data for header
   const user = userProfile ? {
@@ -212,14 +257,14 @@ function HomeContent() {
           />
         </section>
 
-        {/* New Arrivals - Horizontal */}
-        <section className="mb-16">
+        {/* New Arrivals - Hidden for now */}
+        {/* <section className="mb-16">
           <ProductGrid 
             products={newArrivals}
             layout="horizontal"
             title="New Arrivals"
           />
-        </section>
+        </section> */}
 
         {/* All Products - Grid */}
         <section className="mb-16">
