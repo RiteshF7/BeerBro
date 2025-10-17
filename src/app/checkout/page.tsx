@@ -264,29 +264,29 @@ export default function CheckoutPage() {
             Back
           </Button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
-              <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Checkout</h1>
-                <div className="flex items-center space-x-4">
+              <div className="mb-4 sm:mb-6">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-2">Checkout</h1>
+                <div className="flex items-center justify-between sm:justify-start sm:space-x-4">
                   <div className={`flex items-center space-x-2 ${step === 'shipping' ? 'text-primary' : step === 'payment' || step === 'review' ? 'text-green-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' ? 'bg-primary text-white' : step === 'payment' || step === 'review' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                      {step === 'payment' || step === 'review' ? <CheckCircle className="h-4 w-4" /> : '1'}
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step === 'shipping' ? 'bg-primary text-white' : step === 'payment' || step === 'review' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
+                      {step === 'payment' || step === 'review' ? <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" /> : '1'}
                     </div>
-                    <span>Shipping</span>
+                    <span className="text-sm sm:text-base">Shipping</span>
                   </div>
                   <div className={`flex items-center space-x-2 ${step === 'payment' ? 'text-primary' : step === 'review' ? 'text-green-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-primary text-white' : step === 'review' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                      {step === 'review' ? <CheckCircle className="h-4 w-4" /> : '2'}
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step === 'payment' ? 'bg-primary text-white' : step === 'review' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
+                      {step === 'review' ? <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" /> : '2'}
                     </div>
-                    <span>Payment</span>
+                    <span className="text-sm sm:text-base">Payment</span>
                   </div>
                   <div className={`flex items-center space-x-2 ${step === 'review' ? 'text-primary' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-primary text-white' : 'bg-gray-200'}`}>
+                    <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step === 'review' ? 'bg-primary text-white' : 'bg-gray-200'}`}>
                       3
                     </div>
-                    <span>Review</span>
+                    <span className="text-sm sm:text-base">Review</span>
                   </div>
                 </div>
               </div>

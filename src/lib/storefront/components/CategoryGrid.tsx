@@ -139,9 +139,9 @@ function CategoryCard({ category, onCategoryClick }: { category: Category; onCat
       className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 border-0 shadow-sm bg-white"
       onClick={() => onCategoryClick?.(category)}
     >
-      <CardContent className="p-6 text-center">
-        <div className="space-y-4">
-          <div className="relative mx-auto w-20 h-20">
+      <CardContent className="p-3 sm:p-4 md:p-6 text-center">
+        <div className="space-y-2 sm:space-y-3 md:space-y-4">
+          <div className="relative mx-auto w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20">
             <img
               src={imageSrc}
               alt={category.name}
@@ -150,14 +150,14 @@ function CategoryCard({ category, onCategoryClick }: { category: Category; onCat
             {category.isPopular && (
               <Badge 
                 variant="destructive" 
-                className="absolute -top-2 -right-2 text-xs px-2 py-1"
+                className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 text-xs px-1 py-0.5 sm:px-2 sm:py-1"
               >
                 Hot
               </Badge>
             )}
           </div>
           <div className="space-y-1">
-            <h3 className="font-semibold text-sm text-gray-900 group-hover:text-primary transition-colors duration-300">
+            <h3 className="font-semibold text-xs sm:text-sm text-gray-900 group-hover:text-primary transition-colors duration-300 line-clamp-2">
               {category.name}
             </h3>
             <p className="text-xs text-gray-500">
@@ -252,12 +252,12 @@ export function CategoryGrid({
   return (
     <div className="w-full">
       {showTitle && (
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">{title}</h2>
-          <p className="text-gray-600 mt-2">Browse our selection by category</p>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">{title}</h2>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">Browse our selection by category</p>
         </div>
       )}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
         {displayCategories.map((category) => (
           <CategoryCard
             key={category.id}

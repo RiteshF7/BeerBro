@@ -230,11 +230,11 @@ function HomeContent() {
       
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             Welcome to BeerBro
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-4">
             Discover the finest selection of craft beers, wines, and spirits. 
             From local favorites to international classics, we have something for every taste.
           </p>
@@ -248,7 +248,7 @@ function HomeContent() {
         />
 
         {/* Featured Products - Horizontal */}
-        <section className="mb-16">
+        <section className="mb-12 sm:mb-16">
           <ProductGrid 
             products={featuredProducts}
             layout="horizontal"
@@ -266,7 +266,7 @@ function HomeContent() {
         </section> */}
 
         {/* All Products - Grid */}
-        <section className="mb-16">
+        <section className="mb-12 sm:mb-16">
           <ProductGrid 
             products={filteredProducts}
             layout="grid"
@@ -275,15 +275,15 @@ function HomeContent() {
         </section>
 
         {/* Call to Action */}
-        <section className="text-center py-16 bg-white rounded-lg shadow-sm">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <section className="text-center py-12 sm:py-16 bg-white rounded-lg shadow-sm">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
             Ready to Explore More?
           </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
             Join our community of beer enthusiasts and discover exclusive offers, 
             new releases, and expert recommendations.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
             <Button size="lg" asChild>
               <a href="/admin">Admin Console</a>
             </Button>

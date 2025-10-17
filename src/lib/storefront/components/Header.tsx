@@ -49,18 +49,18 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-lg">B</span>
               </div>
-              <span className="text-xl font-bold">BeerBro</span>
+              <span className="text-lg sm:text-xl font-bold">BeerBro</span>
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="flex-1 max-w-md mx-8">
-            <form onSubmit={handleSearch} className="relative">
+          {/* Search Bar - Hidden on mobile, shown on tablet and up */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="text"
@@ -73,7 +73,23 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Search Button - Mobile only */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden"
+              onClick={() => {
+                // You could implement a mobile search modal here
+                const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+                if (searchInput) {
+                  searchInput.focus();
+                }
+              }}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+
             {/* Cart */}
             <Button 
               variant="ghost" 
@@ -96,8 +112,9 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-3 h-auto p-2">
-                    <div className="text-right">
+                  <Button variant="ghost" className="flex items-center space-x-2 sm:space-x-3 h-auto p-1 sm:p-2">
+                    {/* Hide user info on mobile, show only avatar */}
+                    <div className="hidden sm:block text-right">
                       <p className="text-sm font-medium">{user.name}</p>
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
@@ -126,17 +143,33 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="outline" size="sm" onClick={() => router.push('/login')}>
+              <Button variant="outline" size="sm" onClick={() => router.push('/login')} className="hidden sm:flex">
                 <User className="h-4 w-4 mr-2" />
                 Sign In
               </Button>
             )}
 
-            {/* Mobile Menu */}
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
+            {/* Mobile Sign In Button */}
+            {!user && (
+              <Button variant="ghost" size="icon" className="sm:hidden" onClick={() => router.push('/login')}>
+                <User className="h-5 w-5" />
+              </Button>
+            )}
           </div>
+        </div>
+
+        {/* Mobile Search Bar - Shown below header on mobile */}
+        <div className="md:hidden pb-4">
+          <form onSubmit={handleSearch} className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4"
+            />
+          </form>
         </div>
       </div>
     </header>

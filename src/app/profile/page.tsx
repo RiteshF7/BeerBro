@@ -206,7 +206,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="displayName" className="flex items-center">
                       <UserIcon className="h-4 w-4 mr-2" />
@@ -279,17 +279,19 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex justify-end space-x-4 pt-6 border-t">
+                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t">
                   <Button 
                     type="button" 
                     variant="outline"
                     onClick={() => router.back()}
+                    className="w-full sm:w-auto"
                   >
                     Cancel
                   </Button>
                   <Button 
                     type="submit" 
                     disabled={saving}
+                    className="w-full sm:w-auto"
                   >
                     {saving ? (
                       <>

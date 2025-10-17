@@ -151,18 +151,18 @@ export default function CartPage() {
             Back
           </Button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                   Shopping Cart ({cart.totalItems} items)
                 </h1>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={handleClearCart}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-red-600 hover:text-red-700 self-start sm:self-auto"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear Cart
@@ -172,18 +172,18 @@ export default function CartPage() {
               <div className="space-y-4">
                 {cart.items.map((item) => (
                   <Card key={item.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center space-x-4">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
                         <img
                           src={item.product.image}
                           alt={item.product.name}
-                          className="w-20 h-20 object-cover rounded-lg"
+                          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg self-center sm:self-auto"
                         />
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">{item.product.name}</h3>
+                        <div className="flex-1 text-center sm:text-left">
+                          <h3 className="font-semibold text-base sm:text-lg">{item.product.name}</h3>
                           <p className="text-sm text-gray-600 mb-2">{item.product.category}</p>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-bold text-lg">
+                          <div className="flex items-center justify-center sm:justify-start space-x-2">
+                            <span className="font-bold text-base sm:text-lg">
                               {formatPrice(item.product.price)}
                             </span>
                             {item.product.originalPrice && (
@@ -193,7 +193,7 @@ export default function CartPage() {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3">
                           <div className="flex items-center space-x-2">
                             <Button
                               variant="outline"
@@ -216,19 +216,21 @@ export default function CartPage() {
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold text-lg">
-                              {formatPrice(item.product.price * item.quantity)}
+                          <div className="flex items-center space-x-3">
+                            <div className="text-center sm:text-right">
+                              <div className="font-bold text-base sm:text-lg">
+                                {formatPrice(item.product.price * item.quantity)}
+                              </div>
                             </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-red-600 hover:text-red-700"
+                              onClick={() => handleRemoveItem(item.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-red-600 hover:text-red-700"
-                            onClick={() => handleRemoveItem(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       </div>
                     </CardContent>
