@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/lib/common/ui/button';
 import { Input } from '@/lib/common/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/lib/common/ui/avatar';
@@ -14,6 +14,7 @@ import {
 } from '@/lib/common/ui/dropdown-menu';
 import { Search, ShoppingCart, User, Menu, LogOut, Settings, UserCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { cartService } from '../services/cart.service';
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -28,7 +29,15 @@ interface HeaderProps {
 
 export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [actualCartItems, setActualCartItems] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = cartService.subscribe((cart) => {
+      setActualCartItems(cart.totalItems);
+    });
+    return unsubscribe;
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,14 +75,19 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
             {/* Cart */}
-            <Button variant="ghost" size="icon" className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative"
+              onClick={() => router.push('/cart')}
+            >
               <ShoppingCart className="h-5 w-5" />
-              {cartItems > 0 && (
+              {actualCartItems > 0 && (
                 <Badge 
                   variant="destructive" 
                   className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
                 >
-                  {cartItems}
+                  {actualCartItems}
                 </Badge>
               )}
             </Button>

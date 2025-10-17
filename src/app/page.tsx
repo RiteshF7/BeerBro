@@ -5,14 +5,19 @@ import { Header } from '@/lib/storefront/components/Header';
 import { ProductGrid } from '@/lib/storefront/components/ProductGrid';
 import { CategoryGrid } from '@/lib/storefront/components/CategoryGrid';
 import { AuthWrapper } from '@/lib/storefront/components/AuthWrapper';
-import { sampleProducts, sampleCategories } from '@/lib/storefront/data/sampleData';
+import { productsService, Product, Category } from '@/lib/storefront/services/products.service';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Button } from "@/lib/common/ui/button";
+import { Loader2 } from 'lucide-react';
 
 function HomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState(sampleProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = authService.subscribe((state) => {
@@ -24,25 +29,62 @@ function HomeContent() {
     return unsubscribe;
   }, []);
 
-  const handleSearch = (query: string) => {
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        console.log('Loading products from Firestore...');
+        const [productsData, categoriesData] = await Promise.all([
+          productsService.getProducts({ inStock: true }),
+          productsService.getCategories()
+        ]);
+        
+        console.log('Products loaded:', productsData.length);
+        console.log('Categories loaded:', categoriesData.length);
+        console.log('Sample product:', productsData[0]);
+        
+        setProducts(productsData);
+        setCategories(categoriesData);
+        setFilteredProducts(productsData);
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError(`Failed to load products: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const handleSearch = async (query: string) => {
     setSearchQuery(query);
     if (query.trim() === '') {
-      setFilteredProducts(sampleProducts);
+      setFilteredProducts(products);
     } else {
-      const filtered = sampleProducts.filter(product =>
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
-        product.description.toLowerCase().includes(query.toLowerCase()) ||
-        product.category.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredProducts(filtered);
+      try {
+        const searchResults = await productsService.searchProducts(query);
+        setFilteredProducts(searchResults);
+      } catch (err) {
+        console.error('Error searching products:', err);
+        setError('Failed to search products. Please try again.');
+      }
     }
   };
 
-  const handleCategoryClick = (category: { name: string }) => {
-    const filtered = sampleProducts.filter(product =>
-      product.category.toLowerCase() === category.name.toLowerCase()
-    );
-    setFilteredProducts(filtered);
+  const handleCategoryClick = async (category: { name: string }) => {
+    try {
+      const categoryProducts = await productsService.getProducts({ 
+        category: category.name,
+        inStock: true 
+      });
+      setFilteredProducts(categoryProducts);
+    } catch (err) {
+      console.error('Error filtering by category:', err);
+      setError('Failed to filter products. Please try again.');
+    }
   };
 
   const handleSignOut = async () => {
@@ -53,11 +95,28 @@ function HomeContent() {
     }
   };
 
-  // Get featured products (first 4)
-  const featuredProducts = sampleProducts.slice(0, 4);
-  
-  // Get new arrivals (last 4)
-  const newArrivals = sampleProducts.slice(-4);
+  // Get featured and new products
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const loadFeaturedProducts = async () => {
+      try {
+        const [featured, newProducts] = await Promise.all([
+          productsService.getFeaturedProducts(),
+          productsService.getNewProducts()
+        ]);
+        setFeaturedProducts(featured);
+        setNewArrivals(newProducts);
+      } catch (err) {
+        console.error('Error loading featured products:', err);
+      }
+    };
+
+    if (products.length > 0) {
+      loadFeaturedProducts();
+    }
+  }, [products]);
 
   // Prepare user data for header
   const user = userProfile ? {
@@ -66,11 +125,60 @@ function HomeContent() {
     avatar: userProfile.photoURL
   } : null;
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!loading && products.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header 
+          onSearch={() => {}}
+          cartItems={0}
+          user={user}
+          onSignOut={handleSignOut}
+        />
+        
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center py-16">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">No Products Available</h1>
+            <p className="text-lg text-gray-600 mb-8">
+              We&apos;re currently setting up our product catalog. Please check back soon!
+            </p>
+            <p className="text-sm text-gray-500">
+              Make sure Firebase is properly configured and products are added to Firestore.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
         onSearch={handleSearch}
-        cartItems={3}
+        cartItems={0}
         user={user}
         onSignOut={handleSignOut}
       />
@@ -90,7 +198,7 @@ function HomeContent() {
         {/* Categories Section */}
         <section className="mb-16">
           <CategoryGrid 
-            categories={sampleCategories}
+            categories={categories}
             onCategoryClick={handleCategoryClick}
           />
         </section>
