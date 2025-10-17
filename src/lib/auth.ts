@@ -32,7 +32,7 @@ export const requireAdmin = async (): Promise<User> => {
       }
 
       resolve(user);
-    });
+    }); 
   });
 };
 
