@@ -1,18 +1,4 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit,
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { apiService } from './api.service';
 
 export interface Product {
   id: string;
@@ -65,73 +51,11 @@ class ProductsService {
     orderBy?: 'price' | 'rating' | 'createdAt';
     orderDirection?: 'asc' | 'desc';
   }): Promise<Product[]> {
-    if (!db) {
-      console.warn('Firestore not initialized. Please check your Firebase configuration.');
-      return [];
-    }
-
     console.log('Fetching products with filters:', filters);
 
     try {
-      let q = query(collection(db, this.PRODUCTS_COLLECTION));
-
-      if (filters?.category) {
-        q = query(q, where('category', '==', filters.category));
-      }
-
-      // Note: We'll filter inStock on the client side to avoid index requirements
-      // if (filters?.inStock !== undefined) {
-      //   // Handle both inStock boolean and status string fields
-      //   if (filters.inStock) {
-      //     q = query(q, where('status', '==', 'active'));
-      //   } else {
-      //     q = query(q, where('status', '!=', 'active'));
-      //   }
-      // }
-
-      if (filters?.isOnSale !== undefined) {
-        q = query(q, where('isOnSale', '==', filters.isOnSale));
-      }
-
-      if (filters?.isNew !== undefined) {
-        q = query(q, where('isNew', '==', filters.isNew));
-      }
-
-      if (filters?.orderBy) {
-        q = query(q, orderBy(filters.orderBy, filters.orderDirection || 'desc'));
-      }
-
-      if (filters?.limit) {
-        q = query(q, limit(filters.limit));
-      }
-
-      const querySnapshot = await getDocs(q);
-      console.log('Query snapshot size:', querySnapshot.size);
-      console.log('Raw documents:', querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
-      
-      let products = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        const transformedProduct = {
-          id: doc.id,
-          ...data,
-          // Handle different field names
-          image: data.imageUrl || data.image || '',
-          stockQuantity: data.stock || data.stockQuantity || 0,
-          inStock: data.status === 'active' || data.inStock || (data.stock > 0),
-          rating: data.rating || 4.0, // Default rating if not provided
-          reviewCount: data.reviewCount || 0, // Default review count if not provided
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        };
-        console.log('Transformed product:', transformedProduct);
-        return transformedProduct;
-      }) as Product[];
-
-      // Apply client-side filtering for inStock to avoid index requirements
-      if (filters?.inStock !== undefined) {
-        products = products.filter(product => product.inStock === filters.inStock);
-      }
-
+      const products = await apiService.getProducts(filters) as Product[];
+      console.log('Products loaded from API:', products.length);
       return products;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -140,32 +64,9 @@ class ProductsService {
   }
 
   async getProductById(id: string): Promise<Product | null> {
-    if (!db) {
-      console.warn('Firestore not initialized');
-      return null;
-    }
-
     try {
-      const docRef = doc(db, this.PRODUCTS_COLLECTION, id);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        return {
-          id: docSnap.id,
-          ...data,
-          // Handle different field names
-          image: data.imageUrl || data.image || '',
-          stockQuantity: data.stock || data.stockQuantity || 0,
-          inStock: data.status === 'active' || data.inStock || (data.stock > 0),
-          rating: data.rating || 4.0,
-          reviewCount: data.reviewCount || 0,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        } as Product;
-      }
-      
-      return null;
+      const product = await apiService.getProduct(id) as Product;
+      return product;
     } catch (error) {
       console.error('Error fetching product:', error);
       return null;
@@ -173,25 +74,9 @@ class ProductsService {
   }
 
   async searchProducts(searchTerm: string): Promise<Product[]> {
-    if (!db) {
-      console.warn('Firestore not initialized, returning empty array');
-      return [];
-    }
-
     try {
-      // Firestore doesn't support full-text search natively, so we'll fetch all products
-      // and filter them on the client side. For production, consider using Algolia or similar
-      const allProducts = await this.getProducts();
-      const term = searchTerm.toLowerCase();
-      
-      return allProducts.filter(product =>
-        product.name.toLowerCase().includes(term) ||
-        product.description.toLowerCase().includes(term) ||
-        product.category.toLowerCase().includes(term) ||
-        product.brand?.toLowerCase().includes(term) ||
-        product.origin?.toLowerCase().includes(term) ||
-        product.tags?.some(tag => tag.toLowerCase().includes(term))
-      );
+      const products = await apiService.searchProducts(searchTerm) as Product[];
+      return products;
     } catch (error) {
       console.error('Error searching products:', error);
       return [];
@@ -228,21 +113,9 @@ class ProductsService {
 
   // Categories methods
   async getCategories(): Promise<Category[]> {
-    if (!db) {
-      console.warn('Firestore not initialized. Please check your Firebase configuration.');
-      return [];
-    }
-
     try {
-      const q = query(collection(db, this.CATEGORIES_COLLECTION), orderBy('name'));
-      const querySnapshot = await getDocs(q);
-      
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-      })) as Category[];
+      const categories = await apiService.getCategories() as Category[];
+      return categories;
     } catch (error) {
       console.error('Error fetching categories:', error);
       return [];
@@ -250,82 +123,17 @@ class ProductsService {
   }
 
   async getCategoryById(id: string): Promise<Category | null> {
-    if (!db) {
-      console.warn('Firestore not initialized');
-      return null;
-    }
-
     try {
-      const docRef = doc(db, this.CATEGORIES_COLLECTION, id);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        return {
-          id: docSnap.id,
-          ...data,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        } as Category;
-      }
-      
-      return null;
+      const category = await apiService.getCategory(id) as Category;
+      return category;
     } catch (error) {
       console.error('Error fetching category:', error);
       return null;
     }
   }
 
-  // Admin methods (for creating/updating products)
-  async createProduct(productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<string | null> {
-    if (!db) {
-      throw new Error('Firestore not initialized');
-    }
-
-    try {
-      const docRef = await addDoc(collection(db, this.PRODUCTS_COLLECTION), {
-        ...productData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      
-      return docRef.id;
-    } catch (error) {
-      console.error('Error creating product:', error);
-      throw error;
-    }
-  }
-
-  async updateProduct(id: string, updates: Partial<Product>): Promise<void> {
-    if (!db) {
-      throw new Error('Firestore not initialized');
-    }
-
-    try {
-      const docRef = doc(db, this.PRODUCTS_COLLECTION, id);
-      await updateDoc(docRef, {
-        ...updates,
-        updatedAt: serverTimestamp(),
-      });
-    } catch (error) {
-      console.error('Error updating product:', error);
-      throw error;
-    }
-  }
-
-  async deleteProduct(id: string): Promise<void> {
-    if (!db) {
-      throw new Error('Firestore not initialized');
-    }
-
-    try {
-      const docRef = doc(db, this.PRODUCTS_COLLECTION, id);
-      await deleteDoc(docRef);
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      throw error;
-    }
-  }
+  // Note: Admin methods (create, update, delete) are handled by the admin API
+  // and should not be called directly from the storefront
 }
 
 // Export singleton instance
