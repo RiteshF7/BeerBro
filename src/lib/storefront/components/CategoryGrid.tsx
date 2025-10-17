@@ -39,11 +39,39 @@ const HARDCODED_CATEGORIES: Category[] = [
     isPopular: false,
   },
   {
-    id: 'spirits',
-    name: 'Spirits',
-    description: 'Whiskey, vodka, rum, and other premium spirits',
+    id: 'whiskey',
+    name: 'Whiskey',
+    description: 'Premium whiskeys including bourbon, scotch, and rye',
     productCount: 0,
     isPopular: true,
+  },
+  {
+    id: 'gin',
+    name: 'Gin',
+    description: 'Artisanal gins with unique botanical profiles',
+    productCount: 0,
+    isPopular: true,
+  },
+  {
+    id: 'vodka',
+    name: 'Vodka',
+    description: 'Premium vodkas from around the world',
+    productCount: 0,
+    isPopular: false,
+  },
+  {
+    id: 'rum',
+    name: 'Rum',
+    description: 'Aged and spiced rums for every taste',
+    productCount: 0,
+    isPopular: false,
+  },
+  {
+    id: 'tequila',
+    name: 'Tequila',
+    description: 'Authentic tequilas and mezcals from Mexico',
+    productCount: 0,
+    isPopular: false,
   },
   {
     id: 'cocktails',
@@ -78,8 +106,16 @@ const getCategoryImage = (categoryName: string): string => {
     return 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=100&h=100&fit=crop&q=80';
   } else if (categoryLower.includes('wine')) {
     return 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=100&h=100&fit=crop&q=80';
-  } else if (categoryLower.includes('spirit') || categoryLower.includes('whiskey') || categoryLower.includes('vodka')) {
+  } else if (categoryLower.includes('whiskey')) {
     return 'https://images.unsplash.com/photo-1551538827-9c037bd4df7b?w=100&h=100&fit=crop&q=80';
+  } else if (categoryLower.includes('gin')) {
+    return 'https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=100&h=100&fit=crop&q=80';
+  } else if (categoryLower.includes('vodka')) {
+    return 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=100&h=100&fit=crop&q=80';
+  } else if (categoryLower.includes('rum')) {
+    return 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=100&h=100&fit=crop&q=80';
+  } else if (categoryLower.includes('tequila')) {
+    return 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=100&h=100&fit=crop&q=80';
   } else if (categoryLower.includes('cocktail')) {
     return 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=100&h=100&fit=crop&q=80';
   } else if (categoryLower.includes('non-alcoholic') || categoryLower.includes('mocktail')) {

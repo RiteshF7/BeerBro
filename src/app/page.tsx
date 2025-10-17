@@ -261,14 +261,14 @@ function HomeContent() {
           selectedCategory={selectedCategory}
         />
 
-        {/* Featured Products - Horizontal */}
-        <section className="mb-12 sm:mb-16">
+        {/* Featured Products - Hidden */}
+        {/* <section className="mb-12 sm:mb-16">
           <ProductGrid 
             products={featuredProducts}
             layout="horizontal"
             title="Featured Products"
           />
-        </section>
+        </section> */}
 
         {/* New Arrivals - Hidden for now */}
         {/* <section className="mb-16">
