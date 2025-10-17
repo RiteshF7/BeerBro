@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#1f2937"/>
+  
+  <!-- Beer glass -->
+  <rect x="220" y="120" width="72" height="280" rx="8" fill="#fbbf24" stroke="#f59e0b" stroke-width="4"/>
+  
+  <!-- Beer foam -->
+  <ellipse cx="256" cy="140" rx="30" ry="12" fill="#fef3c7"/>
+  <ellipse cx="256" cy="130" rx="25" ry="10" fill="#ffffff"/>
+  
+  <!-- Beer liquid -->
+  <rect x="228" y="150" width="56" height="240" fill="#d97706"/>
+  
+  <!-- Beer bubbles -->
+  <circle cx="240" cy="200" r="3" fill="#ffffff" opacity="0.7"/>
+  <circle cx="270" cy="220" r="2" fill="#ffffff" opacity="0.5"/>
+  <circle cx="250" cy="250" r="2.5" fill="#ffffff" opacity="0.6"/>
+  <circle cx="265" cy="280" r="2" fill="#ffffff" opacity="0.4"/>
+  <circle cx="245" cy="320" r="3" fill="#ffffff" opacity="0.5"/>
+  
+  <!-- Glass rim -->
+  <rect x="210" y="115" width="92" height="8" rx="4" fill="#e5e7eb"/>
+  
+  <!-- Brand text -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#ffffff">B</text>
+</svg>

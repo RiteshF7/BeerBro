@@ -9,6 +9,7 @@ import { productsService, Product, Category } from '@/lib/storefront/services/pr
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Button } from "@/lib/common/ui/button";
 import { Loader2 } from 'lucide-react';
+import InstallAppButton from '@/components/InstallAppButton';
 
 function HomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -246,9 +247,22 @@ function HomeContent() {
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             Welcome to BeerBro
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-4">
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-4 mb-6">
             Discover the finest selection of craft beers, wines, and spirits. 
             From local favorites to international classics, we have something for every taste.
+          </p>
+          
+          {/* Install App Button */}
+          <div className="flex justify-center mb-4">
+            <InstallAppButton 
+              variant="primary" 
+              size="lg" 
+              className="shadow-lg hover:shadow-xl transition-shadow duration-300"
+            />
+          </div>
+          
+          <p className="text-xs text-gray-500 max-w-md mx-auto">
+            Install our app for offline access, push notifications, and a native mobile experience
           </p>
         </div>
 

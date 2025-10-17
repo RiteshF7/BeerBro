@@ -15,6 +15,7 @@ import {
 import { Search, ShoppingCart, User, Menu, LogOut, Settings, UserCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cartService } from '../services/cart.service';
+import InstallAppButton from '@/components/InstallAppButton';
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -74,6 +75,16 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Install App Button - Desktop only */}
+            <div className="hidden lg:block">
+              <InstallAppButton 
+                variant="outline" 
+                size="sm" 
+                showText={false}
+                className="border-primary text-primary hover:bg-primary hover:text-white"
+              />
+            </div>
+
             {/* Search Button - Mobile only */}
             <Button 
               variant="ghost" 

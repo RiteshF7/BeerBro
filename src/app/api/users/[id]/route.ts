@@ -21,10 +21,20 @@ export async function GET(
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      // Return a default user profile instead of 404
+      const defaultUser = {
+        id: userId,
+        email: '',
+        displayName: 'Guest User',
+        photoURL: null,
+        isAdmin: false,
+        preferences: {},
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastLoginAt: new Date(),
+      };
+      
+      return NextResponse.json(defaultUser);
     }
 
     const data = docSnap.data();
@@ -37,8 +47,28 @@ export async function GET(
     };
 
     return NextResponse.json(user);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching user:', error);
+    
+    // Handle permission errors gracefully
+    if (error.code === 'permission-denied') {
+      // Return a default user profile for permission-denied errors
+      const { id: userId } = await params;
+      const defaultUser = {
+        id: userId,
+        email: '',
+        displayName: 'Guest User',
+        photoURL: null,
+        isAdmin: false,
+        preferences: {},
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastLoginAt: new Date(),
+      };
+      
+      return NextResponse.json(defaultUser);
+    }
+    
     return NextResponse.json(
       { error: 'Failed to fetch user' },
       { status: 500 }
@@ -70,8 +100,17 @@ export async function POST(
     await setDoc(doc(db, USERS_COLLECTION, userId), userData);
     
     return NextResponse.json({ success: true }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating user:', error);
+    
+    // Handle permission errors gracefully
+    if (error.code === 'permission-denied') {
+      return NextResponse.json(
+        { error: 'Permission denied. Please check your authentication.' },
+        { status: 403 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Failed to create user' },
       { status: 500 }
@@ -103,8 +142,17 @@ export async function PATCH(
     await updateDoc(docRef, updateData);
     
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating user:', error);
+    
+    // Handle permission errors gracefully
+    if (error.code === 'permission-denied') {
+      return NextResponse.json(
+        { error: 'Permission denied. Please check your authentication.' },
+        { status: 403 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Failed to update user' },
       { status: 500 }
