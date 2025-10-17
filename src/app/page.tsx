@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import FirebaseExample from "@/components/FirebaseExample";
+import { Button } from "@/lib/common/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/lib/common/ui/card";
+import { Input } from "@/lib/common/ui/input";
+import { Label } from "@/lib/common/ui/label";
+import FirebaseExample from "@/lib/common/components/FirebaseExample";
 
 export default function Home() {
   return (

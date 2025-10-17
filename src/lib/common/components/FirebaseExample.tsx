@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useFirebase } from '@/contexts/FirebaseContext';
+import { useFirebase } from '@/lib/common/contexts/FirebaseContext';
 import { authUtils, firestoreUtils } from '@/lib/firebase-utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/lib/common/ui/button';
+import { Input } from '@/lib/common/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/common/ui/card';
 import UserProfile from './UserProfile';
 
 export default function FirebaseExample() {

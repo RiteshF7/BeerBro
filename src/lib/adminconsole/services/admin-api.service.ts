@@ -6,7 +6,7 @@
  */
 
 import { ADMIN_API_ENDPOINTS, ADMIN_ERROR_CODES } from '../constants';
-import type { AdminStats, Product, Order, User, ServiceLocation } from '../types';
+import type { AdminStats, Product, Order, AdminUser, ServiceLocation } from '../types';
 
 /**
  * Base API response interface
@@ -150,16 +150,16 @@ export class AdminApiService {
   /**
    * Users API methods
    */
-  async getUsers(): Promise<User[]> {
-    return this.request<User[]>(ADMIN_API_ENDPOINTS.USERS);
+  async getUsers(): Promise<AdminUser[]> {
+    return this.request<AdminUser[]>(ADMIN_API_ENDPOINTS.USERS);
   }
 
-  async getUser(id: string): Promise<User> {
-    return this.request<User>(`${ADMIN_API_ENDPOINTS.USERS}/${id}`);
+  async getUser(id: string): Promise<AdminUser> {
+    return this.request<AdminUser>(`${ADMIN_API_ENDPOINTS.USERS}/${id}`);
   }
 
-  async updateUser(id: string, user: Partial<User>): Promise<User> {
-    return this.request<User>(`${ADMIN_API_ENDPOINTS.USERS}/${id}`, {
+  async updateUser(id: string, user: Partial<AdminUser>): Promise<AdminUser> {
+    return this.request<AdminUser>(`${ADMIN_API_ENDPOINTS.USERS}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(user),
     });

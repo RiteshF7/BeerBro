@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/common/ui/button';
 import { AdminTable } from '@/components/admin/AdminTable';
-import { ProductForm } from '@/features/products/ProductForm';
-import { ProductWithId, ProductFormData } from '@/features/products/types';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '@/features/products/api';
+import { ProductForm } from '@/lib/adminconsole/products/ProductForm';
+import { ProductWithId, ProductFormData } from '@/lib/adminconsole/products/types';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '@/lib/adminconsole/products/api';
 import { Plus, Package } from 'lucide-react';
 import { toast } from 'sonner';
 

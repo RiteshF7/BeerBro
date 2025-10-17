@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/common/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -9,14 +9,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/lib/common/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/lib/common/ui/select';
 import { OrderWithId } from './types';
 import { ORDER_STATUSES } from '@/lib/constants';
 

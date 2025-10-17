@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFirebase } from '@/contexts/FirebaseContext';
+import { useFirebase } from '@/lib/common/contexts/FirebaseContext';
 import { isAdmin } from '@/lib/auth';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/lib/common/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/lib/common/ui/avatar';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -13,7 +13,7 @@ import {
   DropdownMenuLabel, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
+} from '@/lib/common/ui/dropdown-menu';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import Link from 'next/link';

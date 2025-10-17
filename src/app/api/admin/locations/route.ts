@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getLocations, createLocation } from '@/features/locations/api';
-import { locationSchema } from '@/features/locations/types';
+import { getLocations, createLocation } from '@/lib/adminconsole/locations/api';
+import { locationSchema } from '@/lib/adminconsole/locations/types';
 
 export async function GET() {
   try {

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/common/ui/button';
 import { AdminTable } from '@/components/admin/AdminTable';
-import { LocationForm } from '@/features/locations/LocationForm';
-import { LocationWithId, LocationFormData } from '@/features/locations/types';
-import { getLocations, createLocation, updateLocation, deleteLocation } from '@/features/locations/api';
+import { LocationForm } from '@/lib/adminconsole/locations/LocationForm';
+import { LocationWithId, LocationFormData } from '@/lib/adminconsole/locations/types';
+import { getLocations, createLocation, updateLocation, deleteLocation } from '@/lib/adminconsole/locations/api';
 import { Plus, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 

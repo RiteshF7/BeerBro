@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { AdminStats } from '@/components/admin/AdminStats';
-import { getProducts } from '@/features/products/api';
-import { getOrders } from '@/features/orders/api';
-import { getUsers } from '@/features/users/api';
+import { getProducts } from '@/lib/adminconsole/products/api';
+import { getOrders } from '@/lib/adminconsole/orders/api';
+import { getUsers } from '@/lib/adminconsole/users/api';
 import { Package, ShoppingCart, Users } from 'lucide-react';
 
 export default function AdminDashboard() {

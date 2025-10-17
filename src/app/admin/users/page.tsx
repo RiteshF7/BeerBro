@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/common/ui/button';
 import { AdminTable } from '@/components/admin/AdminTable';
-import { UserForm } from '@/features/users/UserForm';
-import { UserWithId, UserFormData } from '@/features/users/types';
-import { getUsers, createUser, updateUser, deleteUser } from '@/features/users/api';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { UserForm } from '@/lib/adminconsole/users/UserForm';
+import { UserWithId, UserFormData } from '@/lib/adminconsole/users/types';
+import { getUsers, createUser, updateUser, deleteUser } from '@/lib/adminconsole/users/api';
+import { Avatar, AvatarFallback, AvatarImage } from '@/lib/common/ui/avatar';
+import { Badge } from '@/lib/common/ui/badge';
 import { Plus, Users, UserCheck, UserX } from 'lucide-react';
 import { toast } from 'sonner';
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { OrderStatus } from '@/types/admin';
+import { Badge } from '@/lib/common/ui/badge';
+import { OrderStatus } from '@/lib/common/types/admin';
 
 interface StatusBadgeProps {
   status: OrderStatus;

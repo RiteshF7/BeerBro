@@ -7,8 +7,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+} from '@/lib/common/ui/table';
+import { Button } from '@/lib/common/ui/button';
 import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/lib/common/ui/dropdown-menu';
 
 interface Column<T> {
   key: keyof T;

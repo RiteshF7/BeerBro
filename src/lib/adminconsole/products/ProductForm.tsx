@@ -3,17 +3,17 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/lib/common/ui/button';
+import { Input } from '@/lib/common/ui/input';
+import { Label } from '@/lib/common/ui/label';
+import { Textarea } from '@/lib/common/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/lib/common/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/lib/common/ui/dialog';
 import { productSchema, ProductFormData, ProductWithId } from './types';
 import { PRODUCT_CATEGORIES } from '@/lib/constants';
 import { X } from 'lucide-react';

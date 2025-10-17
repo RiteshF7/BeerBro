@@ -5,6 +5,8 @@
  * It centralizes type management for better maintainability and reusability.
  */
 
+import { User } from 'firebase/auth';
+
 // Re-export common admin types from the main types directory
 export type {
   Product,
@@ -13,10 +15,10 @@ export type {
   Address,
   OrderStatus,
   ServiceLocation,
-  User,
+  User as AdminUser,
   UserRole,
   AdminStats
-} from '@/types/admin';
+} from '@/lib/common/types/admin';
 
 /**
  * Navigation item configuration for admin sidebar
@@ -194,4 +196,37 @@ export interface AdminConsolePermissions {
   canViewAnalytics: boolean;
   /** Can export data */
   canExportData: boolean;
+}
+
+/**
+ * Admin console state
+ */
+export interface AdminConsoleState {
+  /** Current user */
+  user: User | null;
+  /** Loading state */
+  isLoading: boolean;
+  /** Error message */
+  error: string | null;
+  /** Active page */
+  activePage: string;
+  /** Sidebar collapsed state */
+  sidebarCollapsed: boolean;
+}
+
+/**
+ * Admin console context value
+ */
+export interface AdminConsoleContextValue {
+  /** Current state */
+  state: AdminConsoleState;
+  /** Available actions */
+  actions: {
+    setUser: (user: User | null) => void;
+    setLoading: (isLoading: boolean) => void;
+    setError: (error: string | null) => void;
+    setActivePage: (page: string) => void;
+    toggleSidebar: () => void;
+    signOut: () => Promise<void>;
+  };
 }

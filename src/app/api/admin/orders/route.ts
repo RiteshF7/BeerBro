@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrders, createOrder } from '@/features/orders/api';
-import { orderSchema } from '@/features/orders/types';
+import { getOrders, createOrder } from '@/lib/adminconsole/orders/api';
+import { orderSchema } from '@/lib/adminconsole/orders/types';
 
 export async function GET() {
   try {

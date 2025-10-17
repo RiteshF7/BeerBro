@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { AdminTable } from '@/components/admin/AdminTable';
-import { OrderStatusDialog } from '@/features/orders/OrderStatusDialog';
-import { OrderDetailsDialog } from '@/features/orders/OrderDetailsDialog';
-import { OrderWithId } from '@/features/orders/types';
-import { getOrders, updateOrderStatus, deleteOrder } from '@/features/orders/api';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { OrderStatusDialog } from '@/lib/adminconsole/orders/OrderStatusDialog';
+import { OrderDetailsDialog } from '@/lib/adminconsole/orders/OrderDetailsDialog';
+import { OrderWithId } from '@/lib/adminconsole/orders/types';
+import { getOrders, updateOrderStatus, deleteOrder } from '@/lib/adminconsole/orders/api';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/lib/common/ui/tabs';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { toast } from 'sonner';
 

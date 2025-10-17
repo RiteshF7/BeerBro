@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/lib/common/ui/button';
+import { Input } from '@/lib/common/ui/input';
+import { Label } from '@/lib/common/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/common/ui/card';
 import { toast } from 'sonner';
 
 export default function LoginPage() {

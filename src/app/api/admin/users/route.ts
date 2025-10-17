@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUsers, createUser } from '@/features/users/api';
-import { userSchema } from '@/features/users/types';
+import { getUsers, createUser } from '@/lib/adminconsole/users/api';
+import { userSchema } from '@/lib/adminconsole/users/types';
 
 export async function GET() {
   try {

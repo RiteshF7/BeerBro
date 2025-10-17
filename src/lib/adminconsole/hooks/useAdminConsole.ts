@@ -7,7 +7,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFirebase } from '@/contexts/FirebaseContext';
+import { useFirebase } from '@/lib/common/contexts/FirebaseContext';
 import { isAdmin } from '@/lib/auth';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';

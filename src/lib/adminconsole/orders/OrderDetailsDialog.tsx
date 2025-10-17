@@ -1,13 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/common/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/lib/common/ui/dialog';
 import { OrderWithId } from './types';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { Calendar, User, MapPin, Package } from 'lucide-react';
