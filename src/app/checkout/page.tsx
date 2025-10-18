@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/lib/common/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/lib/common/ui/card';
-import { Input } from '@/lib/common/ui/input';
-import { Label } from '@/lib/common/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/lib/common/ui/card';
 import { Separator } from '@/lib/common/ui/separator';
 import { Badge } from '@/lib/common/ui/badge';
 import { cartService, Cart, ShippingAddress, PaymentMethod } from '@/lib/storefront/services/cart.service';
@@ -13,11 +11,10 @@ import { ordersService } from '@/lib/storefront/services/orders.service';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Header } from '@/lib/storefront/components/Header';
 import { AddressSelector } from '@/lib/storefront/components/AddressSelector';
+import { QRCodePayment } from '@/lib/storefront/components/QRCodePayment';
 import { Address } from '@/lib/storefront/services/address.service';
 import { 
   ArrowLeft, 
-  CreditCard, 
-  Lock,
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
@@ -44,11 +41,8 @@ export default function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({
-    type: 'card',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardholderName: ''
+    type: 'qr_code',
+    paymentId: ''
   });
 
   useEffect(() => {
@@ -90,7 +84,7 @@ export default function CheckoutPage() {
   // Redirect if not authenticated (only after initial loading is complete)
   useEffect(() => {
     if (!initialLoading && !userProfile && step !== 'success') {
-      router.push('/login');
+      router.push('/login?returnUrl=/checkout');
     }
   }, [userProfile, router, step, initialLoading]);
 
@@ -126,26 +120,8 @@ export default function CheckoutPage() {
   const validatePaymentMethod = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!paymentMethod.cardNumber?.trim()) {
-      newErrors.cardNumber = 'Card number is required';
-    } else if (paymentMethod.cardNumber.replace(/\s/g, '').length < 16) {
-      newErrors.cardNumber = 'Please enter a valid card number';
-    }
-
-    if (!paymentMethod.expiryDate?.trim()) {
-      newErrors.expiryDate = 'Expiry date is required';
-    } else if (!/^\d{2}\/\d{2}$/.test(paymentMethod.expiryDate)) {
-      newErrors.expiryDate = 'Please enter a valid expiry date (MM/YY)';
-    }
-
-    if (!paymentMethod.cvv?.trim()) {
-      newErrors.cvv = 'CVV is required';
-    } else if (paymentMethod.cvv.length < 3) {
-      newErrors.cvv = 'Please enter a valid CVV';
-    }
-
-    if (!paymentMethod.cardholderName?.trim()) {
-      newErrors.cardholderName = 'Cardholder name is required';
+    if (!paymentMethod.paymentId?.trim()) {
+      newErrors.payment = 'Payment must be completed before proceeding';
     }
 
     setErrors(newErrors);
@@ -172,6 +148,21 @@ export default function CheckoutPage() {
       country: address.country,
       phone: address.phone
     });
+  };
+
+  const handlePaymentComplete = (paymentId: string) => {
+    setPaymentMethod(prev => ({
+      ...prev,
+      paymentId
+    }));
+    // Automatically proceed to review step when payment is completed
+    setTimeout(() => {
+      setStep('review');
+    }, 2000); // Wait 2 seconds to show success message
+  };
+
+  const handlePaymentError = (error: string) => {
+    setErrors({ payment: error });
   };
 
   const handlePlaceOrder = async () => {
@@ -209,13 +200,6 @@ export default function CheckoutPage() {
     }).format(price);
   };
 
-  const formatCardNumber = (value: string) => {
-    return value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
-  };
-
-  const formatExpiryDate = (value: string) => {
-    return value.replace(/\D/g, '').replace(/(.{2})/, '$1/');
-  };
 
   // Prepare user data for header
   const user = userProfile ? {
@@ -343,71 +327,11 @@ export default function CheckoutPage() {
 
               {/* Payment Method */}
               {step === 'payment' && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <CreditCard className="h-5 w-5 mr-2" />
-                      Payment Information
-                    </CardTitle>
-                    <CardDescription>
-                      <Lock className="h-4 w-4 inline mr-1" />
-                      Your payment information is secure and encrypted
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="cardNumber">Card Number *</Label>
-                      <Input
-                        id="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        value={paymentMethod.cardNumber}
-                        onChange={(e) => setPaymentMethod(prev => ({ 
-                          ...prev, 
-                          cardNumber: formatCardNumber(e.target.value) 
-                        }))}
-                        className={errors.cardNumber ? 'border-red-500' : ''}
-                      />
-                      {errors.cardNumber && <p className="text-sm text-red-500">{errors.cardNumber}</p>}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="cardholderName">Cardholder Name *</Label>
-                      <Input
-                        id="cardholderName"
-                        value={paymentMethod.cardholderName}
-                        onChange={(e) => setPaymentMethod(prev => ({ ...prev, cardholderName: e.target.value }))}
-                        className={errors.cardholderName ? 'border-red-500' : ''}
-                      />
-                      {errors.cardholderName && <p className="text-sm text-red-500">{errors.cardholderName}</p>}
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="expiryDate">Expiry Date *</Label>
-                        <Input
-                          id="expiryDate"
-                          placeholder="MM/YY"
-                          value={paymentMethod.expiryDate}
-                          onChange={(e) => setPaymentMethod(prev => ({ 
-                            ...prev, 
-                            expiryDate: formatExpiryDate(e.target.value) 
-                          }))}
-                          className={errors.expiryDate ? 'border-red-500' : ''}
-                        />
-                        {errors.expiryDate && <p className="text-sm text-red-500">{errors.expiryDate}</p>}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cvv">CVV *</Label>
-                        <Input
-                          id="cvv"
-                          placeholder="123"
-                          value={paymentMethod.cvv}
-                          onChange={(e) => setPaymentMethod(prev => ({ ...prev, cvv: e.target.value }))}
-                          className={errors.cvv ? 'border-red-500' : ''}
-                        />
-                        {errors.cvv && <p className="text-sm text-red-500">{errors.cvv}</p>}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <QRCodePayment
+                  total={cart.total}
+                  onPaymentComplete={handlePaymentComplete}
+                  onPaymentError={handlePaymentError}
+                />
               )}
 
               {/* Review Order */}
@@ -429,9 +353,9 @@ export default function CheckoutPage() {
                     <div>
                       <h3 className="font-semibold mb-2">Payment Method</h3>
                       <p className="text-gray-600">
-                        **** **** **** {paymentMethod.cardNumber?.slice(-4)}<br />
-                        {paymentMethod.cardholderName}<br />
-                        Expires {paymentMethod.expiryDate}
+                        QR Code Payment<br />
+                        Payment ID: {paymentMethod.paymentId}<br />
+                        Status: Completed
                       </p>
                     </div>
                     <div>
@@ -451,10 +375,10 @@ export default function CheckoutPage() {
 
               {/* Navigation Buttons */}
               <div className="flex justify-between mt-6">
-                {step !== 'shipping' && (
+                {step !== 'shipping' && step !== 'payment' && (
                   <Button 
                     variant="outline" 
-                    onClick={() => setStep(step === 'payment' ? 'shipping' : 'payment')}
+                    onClick={() => setStep(step === 'review' ? 'payment' : 'shipping')}
                   >
                     Back
                   </Button>
@@ -468,11 +392,11 @@ export default function CheckoutPage() {
                     >
                       {loading ? 'Placing Order...' : 'Place Order'}
                     </Button>
-                  ) : (
+                  ) : step === 'shipping' ? (
                     <Button size="lg" onClick={handleNext}>
                       Continue
                     </Button>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>

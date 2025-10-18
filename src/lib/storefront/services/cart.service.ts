@@ -28,11 +28,13 @@ export interface ShippingAddress {
 }
 
 export interface PaymentMethod {
-  type: 'card' | 'paypal' | 'apple_pay' | 'google_pay';
+  type: 'card' | 'paypal' | 'apple_pay' | 'google_pay' | 'qr_code';
   cardNumber?: string;
   expiryDate?: string;
   cvv?: string;
   cardholderName?: string;
+  qrCodeData?: string;
+  paymentId?: string;
 }
 
 export interface Order {

@@ -20,7 +20,7 @@ export default function AddressesPage() {
         setLoading(false);
       } else if (!state.loading) {
         // User not authenticated, redirect to login
-        router.push('/login');
+        router.push('/login?returnUrl=/profile/addresses');
       }
     });
 

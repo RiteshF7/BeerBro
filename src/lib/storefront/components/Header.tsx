@@ -51,12 +51,15 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <div className="flex items-center space-x-2">
+            <button 
+              onClick={() => router.push('/')}
+              className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-lg">B</span>
               </div>
               <span className="text-lg sm:text-xl font-bold">BeerBro</span>
-            </div>
+            </button>
           </div>
 
           {/* Search Bar - Hidden on mobile, shown on tablet and up */}

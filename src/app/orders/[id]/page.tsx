@@ -58,7 +58,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
         setUserProfile(state.profile);
         loadOrder();
       } else if (!state.loading) {
-        router.push('/login');
+        router.push('/login?returnUrl=/orders');
       }
     });
 
@@ -315,13 +315,27 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <p className="font-medium">{order.paymentMethod.cardholderName}</p>
-                    <p className="text-sm text-gray-600">
-                      **** **** **** {order.paymentMethod.cardNumber?.slice(-4)}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Expires {order.paymentMethod.expiryDate}
-                    </p>
+                    {order.paymentMethod.type === 'qr_code' ? (
+                      <>
+                        <p className="font-medium">QR Code Payment</p>
+                        <p className="text-sm text-gray-600">
+                          Payment ID: {order.paymentMethod.paymentId}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Status: Completed
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-medium">{order.paymentMethod.cardholderName}</p>
+                        <p className="text-sm text-gray-600">
+                          **** **** **** {order.paymentMethod.cardNumber?.slice(-4)}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Expires {order.paymentMethod.expiryDate}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>

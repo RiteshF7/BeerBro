@@ -35,8 +35,8 @@ export default function OrdersPage() {
         setUserProfile(state.profile);
         loadOrders(state.profile.uid);
       } else if (!state.loading) {
-        // User not authenticated, redirect to login
-        router.push('/login');
+        // User not authenticated, redirect to login with return URL
+        router.push('/login?returnUrl=/orders');
       }
     });
 

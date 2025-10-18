@@ -64,7 +64,7 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     if (!userProfile) {
-      router.push('/login');
+      router.push('/login?returnUrl=/cart');
       return;
     }
     router.push('/checkout');
