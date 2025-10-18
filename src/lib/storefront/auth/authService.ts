@@ -5,8 +5,8 @@ import {
   onAuthStateChanged,
   updateProfile
 } from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase';
-import { apiService } from '../services/api.service';
+import { doc, getDoc, setDoc, updateDoc as updateFirestoreDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, googleProvider, db } from '@/lib/firebase';
 
 export interface UserProfile {
   uid: string;
@@ -113,6 +113,10 @@ class AuthService {
   }
 
   public async createUserProfile(firebaseUser: FirebaseUser): Promise<UserProfile> {
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
+
     const profile: UserProfile = {
       uid: firebaseUser.uid,
       email: firebaseUser.email || '',
@@ -127,14 +131,44 @@ class AuthService {
       isProfileComplete: false
     };
 
-    await apiService.createUser(firebaseUser.uid, profile);
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    await setDoc(userDocRef, {
+      ...profile,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    
     return profile;
   }
 
   public async getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
-      const user = await apiService.getUser(uid) as UserProfile;
-      return user;
+      if (!db) {
+        console.error('Firestore not initialized');
+        return null;
+      }
+
+      const userDocRef = doc(db, 'users', uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        return {
+          uid,
+          email: data.email || '',
+          displayName: data.displayName || '',
+          phone: data.phone || '',
+          dateOfBirth: data.dateOfBirth || '',
+          photoURL: data.photoURL,
+          role: data.role || 'customer',
+          status: data.status || 'active',
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          isProfileComplete: data.isProfileComplete || false
+        } as UserProfile;
+      }
+      
+      return null;
     } catch (error) {
       console.error('Error getting user profile:', error);
       return null;
@@ -143,13 +177,18 @@ class AuthService {
 
   public async updateUserProfile(uid: string, updates: Partial<UserProfile>): Promise<void> {
     try {
+      if (!db) {
+        throw new Error('Firestore not initialized');
+      }
+
       const updateData = {
         ...updates,
-        updatedAt: new Date(),
+        updatedAt: serverTimestamp(),
         isProfileComplete: this.checkProfileComplete({ ...updates } as UserProfile)
       };
 
-      await apiService.updateUser(uid, updateData);
+      const userDocRef = doc(db, 'users', uid);
+      await updateFirestoreDoc(userDocRef, updateData);
 
       // Update Firebase Auth profile if displayName or photoURL changed
       if (auth?.currentUser && (updates.displayName || updates.photoURL)) {
