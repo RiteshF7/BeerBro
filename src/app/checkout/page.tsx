@@ -171,6 +171,8 @@ export default function CheckoutPage() {
       // Create the order first
       const orderId = await ordersService.createOrder({
         userId: userProfile.uid,
+        userName: userProfile.displayName || 'Unknown User',
+        userEmail: userProfile.email || '',
         items: cart.items,
         shippingAddress,
         paymentMethod,
@@ -202,6 +204,8 @@ export default function CheckoutPage() {
     try {
       const orderId = await ordersService.createOrder({
         userId: userProfile.uid,
+        userName: userProfile.displayName || 'Unknown User',
+        userEmail: userProfile.email || '',
         items: cart.items,
         shippingAddress,
         paymentMethod,

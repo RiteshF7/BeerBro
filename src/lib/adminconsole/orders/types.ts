@@ -18,8 +18,8 @@ export const addressSchema = z.object({
 
 export const orderSchema = z.object({
   userId: z.string(),
-  userEmail: z.string().email(),
-  userName: z.string(),
+  userEmail: z.string().email().optional(),
+  userName: z.string().optional(),
   items: z.array(orderItemSchema),
   total: z.number().min(0),
   status: z.enum(ORDER_STATUSES).default('pending'),
@@ -37,6 +37,8 @@ export interface OrderWithId extends Omit<OrderFormData, 'shippingAddress' | 'it
   updatedAt: Date;
   shippingAddress?: Address;
   paymentStatus?: string;
+  userName?: string;
+  userEmail?: string;
   // Allow for flexible item structure from Firestore
   items?: Array<{
     productId?: string;

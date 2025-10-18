@@ -32,8 +32,8 @@ export default function OrdersPage() {
       label: 'Customer',
       render: (value: unknown, item: OrderWithId) => (
         <div>
-          <p className="font-medium">{value as string || 'No name'}</p>
-          <p className="text-sm text-gray-500">{item.userEmail}</p>
+          <p className="font-medium">{value as string || item.userName || 'Unknown User'}</p>
+          <p className="text-sm text-gray-500">{item.userEmail || 'No email'}</p>
         </div>
       ),
     },

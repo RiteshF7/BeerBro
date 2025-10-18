@@ -5,6 +5,8 @@ import { CartItem, ShippingAddress, PaymentMethod } from './cart.service';
 export interface Order {
   id: string;
   userId: string;
+  userName?: string;
+  userEmail?: string;
   items: CartItem[];
   shippingAddress: ShippingAddress;
   paymentMethod: PaymentMethod;
@@ -22,6 +24,8 @@ export interface Order {
 
 export interface CreateOrderData {
   userId: string;
+  userName?: string;
+  userEmail?: string;
   items: CartItem[];
   shippingAddress: ShippingAddress;
   paymentMethod: PaymentMethod;
