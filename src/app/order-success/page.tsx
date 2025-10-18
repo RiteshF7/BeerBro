@@ -14,7 +14,9 @@ import {
   CreditCard,
   Calendar,
   Home,
-  AlertCircle
+  AlertCircle,
+  Clock,
+  MessageCircle
 } from 'lucide-react';
 import { Header } from '@/lib/storefront/components/Header';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
@@ -116,14 +118,14 @@ function OrderSuccessPageContent() {
           {
             product: {
               name: 'Craft IPA Beer',
-              price: 12.99
+              price: 1299
             },
             quantity: 2
           },
           {
             product: {
               name: 'Premium Red Wine',
-              price: 24.99
+              price: 2499
             },
             quantity: 1
           }
@@ -142,10 +144,10 @@ function OrderSuccessPageContent() {
           type: 'qr_code',
           paymentId: paymentId || 'PAY_123456789'
         },
-        subtotal: 50.97,
-        tax: 4.08,
+        subtotal: 5097,
+        tax: 408,
         shipping: 0,
-        total: 55.05,
+        total: 5505,
         status: 'confirmed',
         createdAt: new Date(),
         estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
@@ -161,9 +163,9 @@ function OrderSuccessPageContent() {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(price);
   };
 
@@ -177,16 +179,150 @@ function OrderSuccessPageContent() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed':
-        return 'bg-green-100 text-green-800';
-      case 'processing':
-        return 'bg-blue-100 text-blue-800';
-      case 'shipped':
-        return 'bg-indigo-100 text-indigo-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'paid':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'preparing':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'out_for_delivery':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
       case 'delivered':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'failed':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  // Get status-specific content and styling
+  const getStatusInfo = (status: string) => {
+    const currentStatus = realTimeOrder?.status || orderDetails?.status || status;
+    
+    switch (currentStatus) {
+      case 'pending':
+        return {
+          icon: <Clock className="h-8 w-8 text-yellow-600" />,
+          title: 'Order Pending',
+          subtitle: 'Your order is being reviewed',
+          description: 'We\'re currently reviewing your order and will confirm it shortly.',
+          bgColor: 'bg-yellow-50',
+          borderColor: 'border-yellow-200',
+          iconBg: 'bg-yellow-100',
+          nextSteps: [
+            'Order under review',
+            'Payment verification in progress',
+            'Confirmation within 2 hours'
+          ]
+        };
+      case 'paid':
+        return {
+          icon: <CheckCircle className="h-8 w-8 text-green-600" />,
+          title: 'Payment Confirmed!',
+          subtitle: 'Your order is being prepared',
+          description: 'Payment has been successfully processed. We\'re now preparing your order.',
+          bgColor: 'bg-green-50',
+          borderColor: 'border-green-200',
+          iconBg: 'bg-green-100',
+          nextSteps: [
+            'Payment confirmed',
+            'Order preparation started',
+            'Ready for dispatch within 24 hours'
+          ]
+        };
+      case 'preparing':
+        return {
+          icon: <Package className="h-8 w-8 text-blue-600" />,
+          title: 'Order Being Prepared',
+          subtitle: 'Your items are being packed',
+          description: 'Our team is carefully preparing your order for shipment.',
+          bgColor: 'bg-blue-50',
+          borderColor: 'border-blue-200',
+          iconBg: 'bg-blue-100',
+          nextSteps: [
+            'Items being packed',
+            'Quality check in progress',
+            'Ready for shipping soon'
+          ]
+        };
+      case 'out_for_delivery':
+        return {
+          icon: <Truck className="h-8 w-8 text-purple-600" />,
+          title: 'Out for Delivery',
+          subtitle: 'Your order is on its way',
+          description: 'Your order has been dispatched and is on its way to you.',
+          bgColor: 'bg-purple-50',
+          borderColor: 'border-purple-200',
+          iconBg: 'bg-purple-100',
+          nextSteps: [
+            'Order dispatched',
+            'In transit to your location',
+            'Expected delivery today'
+          ]
+        };
+      case 'delivered':
+        return {
+          icon: <CheckCircle className="h-8 w-8 text-green-600" />,
+          title: 'Order Delivered!',
+          subtitle: 'Your order has arrived',
+          description: 'Your order has been successfully delivered. Thank you for your purchase!',
+          bgColor: 'bg-green-50',
+          borderColor: 'border-green-200',
+          iconBg: 'bg-green-100',
+          nextSteps: [
+            'Order delivered successfully',
+            'Please check your items',
+            'Enjoy your purchase!'
+          ]
+        };
+      case 'failed':
+        return {
+          icon: <AlertCircle className="h-8 w-8 text-red-600" />,
+          title: 'Order Failed',
+          subtitle: 'There was an issue with your order',
+          description: 'We encountered an issue processing your order. Please contact support.',
+          bgColor: 'bg-red-50',
+          borderColor: 'border-red-200',
+          iconBg: 'bg-red-100',
+          nextSteps: [
+            'Order processing failed',
+            'Payment will be refunded',
+            'Contact support for assistance'
+          ]
+        };
+      case 'cancelled':
+        return {
+          icon: <AlertCircle className="h-8 w-8 text-red-600" />,
+          title: 'Order Cancelled',
+          subtitle: 'Your order has been cancelled',
+          description: 'Your order has been cancelled. Any payment will be refunded.',
+          bgColor: 'bg-red-50',
+          borderColor: 'border-red-200',
+          iconBg: 'bg-red-100',
+          nextSteps: [
+            'Order cancelled',
+            'Refund processing',
+            'Contact support if needed'
+          ]
+        };
+      default:
+        return {
+          icon: <CheckCircle className="h-8 w-8 text-gray-600" />,
+          title: 'Order Confirmed',
+          subtitle: 'Your order is being processed',
+          description: 'Thank you for your order. We\'re processing it now.',
+          bgColor: 'bg-gray-50',
+          borderColor: 'border-gray-200',
+          iconBg: 'bg-gray-100',
+          nextSteps: [
+            'Order confirmed',
+            'Processing in progress',
+            'Updates coming soon'
+          ]
+        };
     }
   };
 
@@ -259,18 +395,24 @@ function OrderSuccessPageContent() {
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Success Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+          {/* Dynamic Status Header */}
+          {(() => {
+            const statusInfo = getStatusInfo(realTimeOrder?.status || orderDetails?.status || 'confirmed');
+            return (
+              <div className={`text-center mb-8 p-8 rounded-lg border-2 ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
+                <div className="flex justify-center mb-4">
+                  <div className={`w-16 h-16 ${statusInfo.iconBg} rounded-full flex items-center justify-center`}>
+                    {statusInfo.icon}
+                  </div>
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{statusInfo.title}</h1>
+                <p className="text-lg text-gray-700 mb-2">{statusInfo.subtitle}</p>
+                <p className="text-gray-600 max-w-2xl mx-auto">
+                  {statusInfo.description}
+                </p>
               </div>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
-            <p className="text-gray-600">
-              Thank you for your order. We&apos;ve received your payment and will process your order shortly.
-            </p>
-          </div>
+            );
+          })()}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Order Details */}
@@ -377,43 +519,80 @@ function OrderSuccessPageContent() {
                   
                   <Separator />
                   
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">Order Placed</p>
-                        <p className="text-xs text-gray-500">{formatDate(orderDetails.createdAt)}</p>
+                  {/* Dynamic Progress Steps */}
+                  {(() => {
+                    const statusInfo = getStatusInfo(realTimeOrder?.status || orderDetails?.status || 'confirmed');
+                    const currentStatus = realTimeOrder?.status || orderDetails?.status || 'confirmed';
+                    
+                    // Define all possible steps
+                    const allSteps = [
+                      { key: 'pending', label: 'Order Placed', date: formatDate(orderDetails.createdAt) },
+                      { key: 'paid', label: 'Payment Confirmed', date: 'Just now' },
+                      { key: 'preparing', label: 'Order Being Prepared', date: 'Within 24 hours' },
+                      { key: 'out_for_delivery', label: 'Out for Delivery', date: 'Within 2-3 days' },
+                      { key: 'delivered', label: 'Delivered', date: formatDate(orderDetails.estimatedDelivery) }
+                    ];
+                    
+                    // Determine which steps are completed based on current status
+                    const getStepStatus = (stepKey: string) => {
+                      const statusOrder = ['pending', 'paid', 'preparing', 'out_for_delivery', 'delivered'];
+                      const currentIndex = statusOrder.indexOf(currentStatus);
+                      const stepIndex = statusOrder.indexOf(stepKey);
+                      
+                      if (stepIndex <= currentIndex) {
+                        return 'completed';
+                      } else if (stepIndex === currentIndex + 1) {
+                        return 'current';
+                      } else {
+                        return 'pending';
+                      }
+                    };
+                    
+                    return (
+                      <div className="space-y-3">
+                        {allSteps.map((step) => {
+                          const stepStatus = getStepStatus(step.key);
+                          return (
+                            <div key={step.key} className="flex items-center space-x-3">
+                              <div className={`w-2 h-2 rounded-full ${
+                                stepStatus === 'completed' ? 'bg-green-500' :
+                                stepStatus === 'current' ? 'bg-blue-500 animate-pulse' :
+                                'bg-gray-300'
+                              }`}></div>
+                              <div>
+                                <p className={`text-sm font-medium ${
+                                  stepStatus === 'completed' ? 'text-green-700' :
+                                  stepStatus === 'current' ? 'text-blue-700' :
+                                  'text-gray-500'
+                                }`}>
+                                  {step.label}
+                                </p>
+                                <p className="text-xs text-gray-500">{step.date}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">Payment Confirmed</p>
-                        <p className="text-xs text-gray-500">Just now</p>
+                    );
+                  })()}
+                  
+                  {/* Next Steps Information */}
+                  {(() => {
+                    const statusInfo = getStatusInfo(realTimeOrder?.status || orderDetails?.status || 'confirmed');
+                    return (
+                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">What's Next:</h4>
+                        <ul className="space-y-1">
+                          {statusInfo.nextSteps.map((step, index) => (
+                            <li key={index} className="text-xs text-gray-600 flex items-center">
+                              <div className="w-1 h-1 bg-gray-400 rounded-full mr-2"></div>
+                              {step}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">Processing</p>
-                        <p className="text-xs text-gray-500">Within 24 hours</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">Shipped</p>
-                        <p className="text-xs text-gray-500">Within 2-3 days</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">Delivered</p>
-                        <p className="text-xs text-gray-500">{formatDate(orderDetails.estimatedDelivery)}</p>
-                      </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
 
@@ -460,24 +639,66 @@ function OrderSuccessPageContent() {
                 </CardContent>
               </Card>
 
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                <Button 
-                  onClick={handleViewOrder}
-                  className="w-full"
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  View Order Details
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={handleContinueShopping}
-                  className="w-full"
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  Continue Shopping
-                </Button>
-              </div>
+              {/* Dynamic Action Buttons */}
+              {(() => {
+                const currentStatus = realTimeOrder?.status || orderDetails?.status || 'confirmed';
+                const statusInfo = getStatusInfo(currentStatus);
+                
+                return (
+                  <div className="space-y-3">
+                    <Button 
+                      onClick={handleViewOrder}
+                      className="w-full"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      View Order Details
+                    </Button>
+                    
+                    {/* Status-specific action buttons */}
+                    {currentStatus === 'delivered' && (
+                      <Button 
+                        variant="outline"
+                        onClick={() => router.push('/contact')}
+                        className="w-full"
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Leave Review
+                      </Button>
+                    )}
+                    
+                    {(currentStatus === 'failed' || currentStatus === 'cancelled') && (
+                      <Button 
+                        variant="outline"
+                        onClick={() => router.push('/contact')}
+                        className="w-full"
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Contact Support
+                      </Button>
+                    )}
+                    
+                    {currentStatus === 'out_for_delivery' && (
+                      <Button 
+                        variant="outline"
+                        onClick={() => router.push('/tracking')}
+                        className="w-full"
+                      >
+                        <Truck className="h-4 w-4 mr-2" />
+                        Track Package
+                      </Button>
+                    )}
+                    
+                    <Button 
+                      variant="outline"
+                      onClick={handleContinueShopping}
+                      className="w-full"
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      Continue Shopping
+                    </Button>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

@@ -69,7 +69,7 @@ function PaymentProcessingPageContent() {
           paymentId,
           status: 'pending', // Start as pending, not processing
           amount: parseFloat(amount || '0'),
-          currency: 'USD',
+          currency: 'INR',
           userId: userProfile?.uid || 'anonymous'
         });
 
