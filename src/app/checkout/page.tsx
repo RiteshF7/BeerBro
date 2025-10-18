@@ -165,6 +165,12 @@ export default function CheckoutPage() {
     setErrors({ payment: error });
   };
 
+  const handleProceedToPayment = () => {
+    // Navigate to payment processing page
+    const paymentId = paymentMethod.paymentId || `PAY_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    router.push(`/payment-processing?paymentId=${paymentId}&orderId=temp&amount=${cart.total}`);
+  };
+
   const handlePlaceOrder = async () => {
     if (!userProfile) return;
 
@@ -331,6 +337,7 @@ export default function CheckoutPage() {
                   total={cart.total}
                   onPaymentComplete={handlePaymentComplete}
                   onPaymentError={handlePaymentError}
+                  onProceed={handleProceedToPayment}
                 />
               )}
 

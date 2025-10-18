@@ -2,6 +2,7 @@ import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
+import { getDatabase, Database } from 'firebase/database';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -27,6 +28,7 @@ let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 let storage: FirebaseStorage | null = null;
+let database: Database | null = null;
 
 try {
   if (getApps().length === 0 && isFirebaseConfigured()) {
@@ -40,6 +42,7 @@ try {
     auth = getAuth(app);
     db = getFirestore(app);
     storage = getStorage(app);
+    database = getDatabase(app);
   }
 } catch (error) {
   console.error('Firebase initialization failed:', error);
@@ -53,6 +56,6 @@ googleProvider.setCustomParameters({
 });
 
 // Initialize Firebase services
-export { auth, db, storage, googleProvider, isFirebaseConfigured };
+export { auth, db, storage, database, googleProvider, isFirebaseConfigured };
 
 export default app;

@@ -11,6 +11,7 @@ interface QRCodePaymentProps {
   total: number;
   onPaymentComplete: (paymentId: string) => void;
   onPaymentError: (error: string) => void;
+  onProceed: () => void;
 }
 
 interface PaymentStatus {
@@ -19,7 +20,7 @@ interface PaymentStatus {
   paymentId?: string;
 }
 
-export function QRCodePayment({ total, onPaymentComplete, onPaymentError }: QRCodePaymentProps) {
+export function QRCodePayment({ total, onPaymentComplete, onPaymentError, onProceed }: QRCodePaymentProps) {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>({
     status: 'pending',
@@ -181,6 +182,14 @@ export function QRCodePayment({ total, onPaymentComplete, onPaymentError }: QRCo
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Payment Instructions */}
+        <div className="text-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800 font-medium">
+            Scan this QR code with your payment app and pay the amount of{' '}
+            <span className="font-bold">${total.toFixed(2)}</span>
+          </p>
+        </div>
+
         {/* Payment Status */}
         <div className={`p-4 rounded-lg border flex items-center space-x-3 ${getStatusColor()}`}>
           {getStatusIcon()}
@@ -244,6 +253,15 @@ export function QRCodePayment({ total, onPaymentComplete, onPaymentError }: QRCo
               )}
             </Button>
           )}
+          
+          {/* Proceed Button */}
+          <Button 
+            onClick={onProceed}
+            className="w-full"
+            size="lg"
+          >
+            Proceed to Payment Processing
+          </Button>
         </div>
 
         {/* Payment Amount */}

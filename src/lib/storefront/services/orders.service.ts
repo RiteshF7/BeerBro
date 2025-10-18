@@ -13,6 +13,7 @@ export interface Order {
   shipping: number;
   total: number;
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'expired';
   createdAt: Date;
   updatedAt: Date;
   trackingNumber?: string;
@@ -44,6 +45,7 @@ class OrdersService {
       const orderDoc = {
         ...orderData,
         status: 'pending' as const,
+        paymentStatus: 'pending' as const,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -149,6 +151,24 @@ class OrdersService {
       await updateDoc(orderRef, updateData);
     } catch (error) {
       console.error('Error updating order status:', error);
+      throw error;
+    }
+  }
+
+  // Update payment status in order
+  async updateOrderPaymentStatus(orderId: string, paymentStatus: Order['paymentStatus']): Promise<void> {
+    try {
+      if (!db) {
+        throw new Error('Firestore not initialized');
+      }
+
+      const orderRef = doc(db, this.ORDERS_COLLECTION, orderId);
+      await updateDoc(orderRef, {
+        paymentStatus,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Error updating order payment status:', error);
       throw error;
     }
   }
