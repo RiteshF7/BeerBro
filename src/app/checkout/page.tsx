@@ -12,10 +12,11 @@ import { cartService, Cart, ShippingAddress, PaymentMethod } from '@/lib/storefr
 import { ordersService } from '@/lib/storefront/services/orders.service';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Header } from '@/lib/storefront/components/Header';
+import { AddressSelector } from '@/lib/storefront/components/AddressSelector';
+import { Address } from '@/lib/storefront/services/address.service';
 import { 
   ArrowLeft, 
   CreditCard, 
-  MapPin, 
   Lock,
   CheckCircle,
   AlertCircle
@@ -37,9 +38,10 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zipCode: '',
-    country: 'United States',
-    phone: ''
+    country: 'India',
+    phone: '+91 '
   });
+  const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({
     type: 'card',
@@ -62,6 +64,7 @@ export default function CheckoutPage() {
           ...prev,
           firstName: state.profile?.displayName?.split(' ')[0] || '',
           lastName: state.profile?.displayName?.split(' ').slice(1).join(' ') || '',
+          phone: state.profile?.phone || '+91 '
         }));
       }
       
@@ -155,6 +158,20 @@ export default function CheckoutPage() {
     } else if (step === 'payment' && validatePaymentMethod()) {
       setStep('review');
     }
+  };
+
+  const handleAddressSelect = (address: Address) => {
+    setSelectedAddressId(address.id);
+    setShippingAddress({
+      firstName: address.firstName,
+      lastName: address.lastName,
+      address: address.address,
+      city: address.city,
+      state: address.state,
+      zipCode: address.zipCode,
+      country: address.country,
+      phone: address.phone
+    });
   };
 
   const handlePlaceOrder = async () => {
@@ -318,91 +335,10 @@ export default function CheckoutPage() {
 
               {/* Shipping Address */}
               {step === 'shipping' && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <MapPin className="h-5 w-5 mr-2" />
-                      Shipping Address
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name *</Label>
-                        <Input
-                          id="firstName"
-                          value={shippingAddress.firstName}
-                          onChange={(e) => setShippingAddress(prev => ({ ...prev, firstName: e.target.value }))}
-                          className={errors.firstName ? 'border-red-500' : ''}
-                        />
-                        {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name *</Label>
-                        <Input
-                          id="lastName"
-                          value={shippingAddress.lastName}
-                          onChange={(e) => setShippingAddress(prev => ({ ...prev, lastName: e.target.value }))}
-                          className={errors.lastName ? 'border-red-500' : ''}
-                        />
-                        {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Address *</Label>
-                      <Input
-                        id="address"
-                        value={shippingAddress.address}
-                        onChange={(e) => setShippingAddress(prev => ({ ...prev, address: e.target.value }))}
-                        className={errors.address ? 'border-red-500' : ''}
-                      />
-                      {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="city">City *</Label>
-                        <Input
-                          id="city"
-                          value={shippingAddress.city}
-                          onChange={(e) => setShippingAddress(prev => ({ ...prev, city: e.target.value }))}
-                          className={errors.city ? 'border-red-500' : ''}
-                        />
-                        {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="state">State *</Label>
-                        <Input
-                          id="state"
-                          value={shippingAddress.state}
-                          onChange={(e) => setShippingAddress(prev => ({ ...prev, state: e.target.value }))}
-                          className={errors.state ? 'border-red-500' : ''}
-                        />
-                        {errors.state && <p className="text-sm text-red-500">{errors.state}</p>}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="zipCode">ZIP Code *</Label>
-                        <Input
-                          id="zipCode"
-                          value={shippingAddress.zipCode}
-                          onChange={(e) => setShippingAddress(prev => ({ ...prev, zipCode: e.target.value }))}
-                          className={errors.zipCode ? 'border-red-500' : ''}
-                        />
-                        {errors.zipCode && <p className="text-sm text-red-500">{errors.zipCode}</p>}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={shippingAddress.phone}
-                        onChange={(e) => setShippingAddress(prev => ({ ...prev, phone: e.target.value }))}
-                        className={errors.phone ? 'border-red-500' : ''}
-                      />
-                      {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
-                    </div>
-                  </CardContent>
-                </Card>
+                <AddressSelector 
+                  onAddressSelect={handleAddressSelect}
+                  selectedAddressId={selectedAddressId}
+                />
               )}
 
               {/* Payment Method */}

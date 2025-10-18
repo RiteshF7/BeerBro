@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/lib/common/ui/avatar';
 import { Badge } from '@/lib/common/ui/badge';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { User } from 'firebase/auth';
-import { ArrowLeft, Save, User as UserIcon, Mail, Phone, Calendar, Camera } from 'lucide-react';
+import { ArrowLeft, Save, User as UserIcon, Mail, Phone, Calendar, Camera, MapPin } from 'lucide-react';
 import { Header } from '@/lib/storefront/components/Header';
 
 export default function ProfilePage() {
@@ -307,6 +307,35 @@ export default function ProfilePage() {
                   </Button>
                 </div>
               </form>
+            </CardContent>
+          </Card>
+
+          {/* Address Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <MapPin className="h-5 w-5 mr-2" />
+                Address Management
+              </CardTitle>
+              <CardDescription>
+                Manage your delivery addresses for faster checkout
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">
+                    Add, edit, and manage your delivery addresses
+                  </p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => router.push('/profile/addresses')}
+                >
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Manage Addresses
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
