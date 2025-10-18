@@ -26,6 +26,7 @@ export default function CheckoutPage() {
   const [cart, setCart] = useState<Cart>(cartService.getCart());
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [step, setStep] = useState<'shipping' | 'payment' | 'review' | 'success'>('shipping');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -63,6 +64,11 @@ export default function CheckoutPage() {
           lastName: state.profile?.displayName?.split(' ').slice(1).join(' ') || '',
         }));
       }
+      
+      // Set initial loading to false after auth state is determined
+      if (!state.loading) {
+        setInitialLoading(false);
+      }
     });
 
     return () => {
@@ -71,19 +77,19 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (only after initial loading is complete)
   useEffect(() => {
-    if (cart.items.length === 0 && step !== 'success') {
+    if (!initialLoading && cart.items.length === 0 && step !== 'success') {
       router.push('/cart');
     }
-  }, [cart.items.length, router, step]);
+  }, [cart.items.length, router, step, initialLoading]);
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated (only after initial loading is complete)
   useEffect(() => {
-    if (!userProfile && step !== 'success') {
+    if (!initialLoading && !userProfile && step !== 'success') {
       router.push('/login');
     }
-  }, [userProfile, router, step]);
+  }, [userProfile, router, step, initialLoading]);
 
   const validateShippingAddress = () => {
     const newErrors: Record<string, string> = {};
@@ -209,6 +215,18 @@ export default function CheckoutPage() {
       console.error('Error signing out:', error);
     }
   };
+
+  // Show loading screen while determining initial state
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (step === 'success') {
     return (
