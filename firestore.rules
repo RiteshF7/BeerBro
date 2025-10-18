@@ -2,16 +2,16 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Products - publicly readable, authenticated write
+    // Products - publicly readable, admin write only
     match /products/{document} {
       allow read: if true; // Public read access for storefront
-      allow write: if request.auth != null; // Authenticated write for admin
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
     }
     
-    // Categories - publicly readable, authenticated write
+    // Categories - publicly readable, admin write only
     match /categories/{document} {
       allow read: if true; // Public read access for storefront
-      allow write: if request.auth != null; // Authenticated write for admin
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
     }
     
     // Users - only authenticated access to own data
@@ -20,16 +20,17 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Orders - only authenticated access to own orders
+    // Orders - only authenticated access to own orders, admin can access all
     match /orders/{orderId} {
       allow read: if request.auth != null && 
         (resource.data.userId == request.auth.uid || 
          request.auth.token.role == 'admin');
       allow create: if request.auth != null && 
         request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null && 
-        (resource.data.userId == request.auth.uid || 
+      allow update: if request.auth != null && 
+        (resource.data.userId == request.auth.uid ||
          request.auth.token.role == 'admin');
+      allow delete: if request.auth != null && request.auth.token.role == 'admin';
     }
     
     // Admin collections - require admin role
@@ -37,7 +38,7 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.token.role == 'admin';
     }
     
-    // Delivery zones - publicly readable, admin write
+    // Delivery zones - publicly readable, admin write only
     match /delivery-zones/{document} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.token.role == 'admin';
@@ -51,7 +52,7 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.token.role == 'admin';
     }
     
-    // Addresses - only authenticated access to own addresses
+    // Addresses - only authenticated access to own addresses, admin can access all
     match /addresses/{addressId} {
       allow read, write: if request.auth != null && 
         (resource.data.userId == request.auth.uid || 
@@ -61,6 +62,16 @@ service cloud.firestore {
       allow update, delete: if request.auth != null && 
         (resource.data.userId == request.auth.uid || 
          request.auth.token.role == 'admin');
+    }
+    
+    // Payments - authenticated users can create, read own payments, admin can update/delete
+    match /payments/{paymentId} {
+      allow read: if request.auth != null && 
+        (resource.data.userId == request.auth.uid || 
+         request.auth.token.role == 'admin');
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && request.auth.token.role == 'admin';
     }
   }
 }

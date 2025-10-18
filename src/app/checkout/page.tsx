@@ -155,10 +155,8 @@ export default function CheckoutPage() {
       ...prev,
       paymentId
     }));
-    // Automatically proceed to review step when payment is completed
-    setTimeout(() => {
-      setStep('review');
-    }, 2000); // Wait 2 seconds to show success message
+    // REMOVED: Automatic progression to review step
+    // Payment completion should only happen via admin confirmation
   };
 
   const handlePaymentError = (error: string) => {
@@ -333,12 +331,26 @@ export default function CheckoutPage() {
 
               {/* Payment Method */}
               {step === 'payment' && (
-                <QRCodePayment
-                  total={cart.total}
-                  onPaymentComplete={handlePaymentComplete}
-                  onPaymentError={handlePaymentError}
-                  onProceed={handleProceedToPayment}
-                />
+                <div className="space-y-4">
+                  <QRCodePayment
+                    total={cart.total}
+                    onPaymentComplete={handlePaymentComplete}
+                    onPaymentError={handlePaymentError}
+                    onProceed={handleProceedToPayment}
+                  />
+                  
+                  {/* Manual Continue Button */}
+                  {paymentMethod.paymentId && (
+                    <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-800 mb-3">
+                        Payment ID generated: <strong>{paymentMethod.paymentId}</strong>
+                      </p>
+                      <p className="text-sm text-green-700 mb-4">
+                        Click &quot;Proceed to Payment Processing&quot; to submit your payment for admin review.
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Review Order */}

@@ -1,13 +1,13 @@
 import { 
-  ref, 
-  set, 
-  get, 
-  onValue, 
-  off, 
-  push, 
+  collection, 
+  addDoc, 
+  doc, 
+  updateDoc, 
+  getDoc, 
+  onSnapshot, 
   serverTimestamp 
-} from 'firebase/database';
-import { database } from '@/lib/firebase';
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export interface PaymentStatus {
   id: string;
@@ -26,29 +26,22 @@ class PaymentService {
   private listeners: Map<string, () => void> = new Map();
 
   /**
-   * Create a new payment record in Firebase Realtime Database
+   * Create a new payment record in Firestore
    */
   async createPayment(paymentData: Omit<PaymentStatus, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     try {
-      if (!database) {
-        throw new Error('Firebase Realtime Database not initialized');
+      if (!db) {
+        throw new Error('Firestore not initialized');
       }
 
-      const paymentRef = push(ref(database, 'payments'));
-      const paymentId = paymentRef.key!;
-
-      const payment: PaymentStatus = {
-        id: paymentId,
+      const paymentDoc = {
         ...paymentData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      await set(paymentRef, {
-        ...payment,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      });
+      };
+
+      const docRef = await addDoc(collection(db, 'payments'), paymentDoc);
+      const paymentId = docRef.id;
 
       return paymentId;
     } catch (error) {
@@ -66,17 +59,17 @@ class PaymentService {
     message?: string
   ): Promise<void> {
     try {
-      if (!database) {
-        throw new Error('Firebase Realtime Database not initialized');
+      if (!db) {
+        throw new Error('Firestore not initialized');
       }
 
-      const paymentRef = ref(database, `payments/${paymentId}`);
+      const paymentRef = doc(db, 'payments', paymentId);
       
-      await set(paymentRef, {
+      await updateDoc(paymentRef, {
         status,
         message,
         updatedAt: serverTimestamp()
-      }, { merge: true });
+      });
     } catch (error) {
       console.error('Error updating payment status:', error);
       throw error;
@@ -88,15 +81,15 @@ class PaymentService {
    */
   async getPayment(paymentId: string): Promise<PaymentStatus | null> {
     try {
-      if (!database) {
-        throw new Error('Firebase Realtime Database not initialized');
+      if (!db) {
+        throw new Error('Firestore not initialized');
       }
 
-      const paymentRef = ref(database, `payments/${paymentId}`);
-      const snapshot = await get(paymentRef);
+      const paymentRef = doc(db, 'payments', paymentId);
+      const snapshot = await getDoc(paymentRef);
       
       if (snapshot.exists()) {
-        const data = snapshot.val();
+        const data = snapshot.data();
         return {
           id: paymentId,
           orderId: data.orderId,
@@ -126,15 +119,15 @@ class PaymentService {
     callback: (payment: PaymentStatus | null) => void
   ): () => void {
     try {
-      if (!database) {
-        throw new Error('Firebase Realtime Database not initialized');
+      if (!db) {
+        throw new Error('Firestore not initialized');
       }
 
-      const paymentRef = ref(database, `payments/${paymentId}`);
+      const paymentRef = doc(db, 'payments', paymentId);
       
-      const listener = onValue(paymentRef, (snapshot) => {
+      const unsubscribe = onSnapshot(paymentRef, (snapshot) => {
         if (snapshot.exists()) {
-          const data = snapshot.val();
+          const data = snapshot.data();
           const payment: PaymentStatus = {
             id: paymentId,
             orderId: data.orderId,
@@ -154,11 +147,6 @@ class PaymentService {
       });
 
       // Store the unsubscribe function
-      const unsubscribe = () => {
-        off(paymentRef, 'value', listener);
-        this.listeners.delete(paymentId);
-      };
-
       this.listeners.set(paymentId, unsubscribe);
       return unsubscribe;
     } catch (error) {
@@ -167,31 +155,7 @@ class PaymentService {
     }
   }
 
-  /**
-   * Simulate payment processing (for demo purposes)
-   * In a real app, this would be triggered by external payment gateway webhooks
-   */
-  async simulatePaymentProcessing(paymentId: string): Promise<void> {
-    try {
-      // Update to processing status
-      await this.updatePaymentStatus(paymentId, 'processing', 'Payment is being processed...');
-      
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulate completion (90% success rate)
-      const isSuccess = Math.random() > 0.1;
-      
-      if (isSuccess) {
-        await this.updatePaymentStatus(paymentId, 'completed', 'Payment completed successfully!');
-      } else {
-        await this.updatePaymentStatus(paymentId, 'failed', 'Payment processing failed. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error simulating payment processing:', error);
-      await this.updatePaymentStatus(paymentId, 'failed', 'Payment processing failed. Please try again.');
-    }
-  }
+  // REMOVED: simulatePaymentProcessing method - no automatic processing
 
   /**
    * Clean up all listeners

@@ -1,15 +1,44 @@
 import { auth } from './firebase';
 import { User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
-// Admin email addresses - in production, this should be stored in Firestore or environment variables
-const ADMIN_EMAILS = [
-  'noip9211@gmail.com',
-  'admin@example.com', // Add your admin emails here
-];
-
-export const isAdmin = (user: User | null): boolean => {
-  if (!user || !user.email) return false;
-  return ADMIN_EMAILS.includes(user.email);
+export const isAdmin = async (user: User | null): Promise<boolean> => {
+  if (!user) {
+    console.log('isAdmin: No user provided');
+    return false;
+  }
+  
+  try {
+    if (!db) {
+      console.error('isAdmin: Firestore not initialized');
+      return false;
+    }
+    
+    // Check user role from Firestore document
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      console.log('isAdmin: User document not found in Firestore');
+      return false;
+    }
+    
+    const userData = userDoc.data();
+    const userRole = userData.role;
+    
+    console.log('isAdmin: User email:', user.email);
+    console.log('isAdmin: User UID:', user.uid);
+    console.log('isAdmin: User role from Firestore:', userRole);
+    
+    const isAdminUser = userRole === 'admin';
+    console.log('isAdmin: Is admin?', isAdminUser);
+    
+    return isAdminUser;
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
 };
 
 export const requireAdmin = async (): Promise<User> => {
@@ -17,8 +46,8 @@ export const requireAdmin = async (): Promise<User> => {
     throw new Error('Firebase Auth not initialized');
   }
 
-  return new Promise((resolve, reject) => {
-    const unsubscribe = auth!.onAuthStateChanged((user) => {
+  return new Promise(async (resolve, reject) => {
+    const unsubscribe = auth!.onAuthStateChanged(async (user) => {
       unsubscribe();
       
       if (!user) {
@@ -26,7 +55,8 @@ export const requireAdmin = async (): Promise<User> => {
         return;
       }
 
-      if (!isAdmin(user)) {
+      const userIsAdmin = await isAdmin(user);
+      if (!userIsAdmin) {
         reject(new Error('Access denied: Admin privileges required'));
         return;
       }

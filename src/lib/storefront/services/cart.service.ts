@@ -93,8 +93,6 @@ class CartService {
 
   // Add item to cart
   addItem(product: Product, quantity: number = 1): void {
-    console.log('Adding item to cart:', product.name, 'quantity:', quantity);
-    
     const existingItemIndex = this.cart.items.findIndex(
       item => item.product.id === product.id
     );
@@ -102,7 +100,6 @@ class CartService {
     if (existingItemIndex >= 0) {
       // Update existing item quantity
       this.cart.items[existingItemIndex].quantity += quantity;
-      console.log('Updated existing item quantity to:', this.cart.items[existingItemIndex].quantity);
     } else {
       // Add new item
       const newItem: CartItem = {
@@ -112,14 +109,11 @@ class CartService {
         addedAt: new Date(),
       };
       this.cart.items.push(newItem);
-      console.log('Added new item to cart:', newItem);
     }
 
     this.updateCartTotals();
     this.saveCartToStorage();
     this.notifyListeners();
-    
-    console.log('Cart after adding item:', this.cart);
   }
 
   // Remove item from cart

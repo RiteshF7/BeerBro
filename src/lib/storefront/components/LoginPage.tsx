@@ -9,15 +9,17 @@ import { Chrome, Loader2 } from 'lucide-react';
 
 interface LoginPageProps {
   onLoginSuccess: (user: User, isNewUser: boolean) => void;
+  onLoginStart?: () => void;
 }
 
-export function LoginPage({ onLoginSuccess }: LoginPageProps) {
+export function LoginPage({ onLoginSuccess, onLoginStart }: LoginPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     setError(null);
+    onLoginStart?.();
 
     try {
       const { user, isNewUser } = await authService.signInWithGoogle();

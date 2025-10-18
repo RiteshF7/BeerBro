@@ -142,7 +142,7 @@ export default function AdminPaymentsPage() {
               </div>
               <div>
                 <Label htmlFor="status">New Status</Label>
-                <Select value={selectedStatus} onValueChange={(value: any) => setSelectedStatus(value)}>
+                <Select value={selectedStatus} onValueChange={(value: 'pending' | 'processing' | 'completed' | 'failed') => setSelectedStatus(value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -232,7 +232,7 @@ export default function AdminPaymentsPage() {
               {selectedStatus === 'completed' && (
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm text-green-800">
-                    <strong>Note:</strong> When you update this payment to "Completed", the order status will automatically be updated to "Confirmed".
+                    <strong>Note:</strong> When you update this payment to &quot;Completed&quot;, the order status will automatically be updated to &quot;Confirmed&quot;.
                   </p>
                 </div>
               )}
@@ -249,7 +249,7 @@ export default function AdminPaymentsPage() {
             <div className="space-y-2">
               <h3 className="font-semibold">Step 1: Start Payment</h3>
               <p className="text-sm text-gray-600">
-                Go to checkout and click "Proceed to Payment Processing" to start a payment.
+                Go to checkout and click &quot;Proceed to Payment Processing&quot; to start a payment.
               </p>
             </div>
             <div className="space-y-2">
@@ -261,7 +261,7 @@ export default function AdminPaymentsPage() {
             <div className="space-y-2">
               <h3 className="font-semibold">Step 3: Update Status</h3>
               <p className="text-sm text-gray-600">
-                Enter the Payment ID above and select "Completed" status, then click "Update Status".
+                Enter the Payment ID above and select &quot;Completed&quot; status, then click &quot;Update Status&quot;.
               </p>
             </div>
             <div className="space-y-2">

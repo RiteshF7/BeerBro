@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/lib/common/ui/card';
 import { Button } from '@/lib/common/ui/button';
@@ -15,7 +15,8 @@ import {
   CreditCard,
   Calendar,
   ArrowRight,
-  Home
+  Home,
+  AlertCircle
 } from 'lucide-react';
 import { Header } from '@/lib/storefront/components/Header';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
@@ -53,7 +54,7 @@ interface OrderDetails {
   estimatedDelivery: Date;
 }
 
-export default function OrderSuccessPage() {
+function OrderSuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -265,7 +266,7 @@ export default function OrderSuccessPage() {
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
             <p className="text-gray-600">
-              Thank you for your order. We've received your payment and will process your order shortly.
+              Thank you for your order. We&apos;ve received your payment and will process your order shortly.
             </p>
           </div>
 
@@ -480,5 +481,13 @@ export default function OrderSuccessPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OrderSuccessPageContent />
+    </Suspense>
   );
 }

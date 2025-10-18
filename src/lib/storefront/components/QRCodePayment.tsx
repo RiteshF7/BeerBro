@@ -66,8 +66,7 @@ export function QRCodePayment({ total, onPaymentComplete, onPaymentError, onProc
         paymentId
       });
 
-      // Start payment status polling (simulated)
-      startPaymentPolling(paymentId);
+      // REMOVED: Payment status polling - no automatic processing
       
     } catch (error) {
       console.error('Error generating QR code:', error);
@@ -77,46 +76,7 @@ export function QRCodePayment({ total, onPaymentComplete, onPaymentError, onProc
     }
   };
 
-  // Simulate payment status polling
-  const startPaymentPolling = (paymentId: string) => {
-    const pollInterval = setInterval(() => {
-      // Simulate payment status changes
-      const random = Math.random();
-      
-      if (random < 0.1) { // 10% chance of payment completion
-        setPaymentStatus({
-          status: 'completed',
-          message: 'Payment completed successfully!',
-          paymentId
-        });
-        onPaymentComplete(paymentId);
-        clearInterval(pollInterval);
-      } else if (random < 0.15) { // 5% chance of payment failure
-        setPaymentStatus({
-          status: 'failed',
-          message: 'Payment failed. Please try again.'
-        });
-        onPaymentError('Payment failed. Please try again.');
-        clearInterval(pollInterval);
-      } else if (random < 0.2) { // 5% chance of processing
-        setPaymentStatus({
-          status: 'processing',
-          message: 'Payment is being processed...'
-        });
-      }
-    }, 3000); // Check every 3 seconds
-
-    // Clear interval after 5 minutes
-    setTimeout(() => {
-      clearInterval(pollInterval);
-      if (paymentStatus.status === 'pending' || paymentStatus.status === 'processing') {
-        setPaymentStatus({
-          status: 'expired',
-          message: 'Payment session expired. Please generate a new QR code.'
-        });
-      }
-    }, 300000); // 5 minutes
-  };
+  // REMOVED: Payment status polling function - no automatic processing
 
   // Countdown timer
   useEffect(() => {

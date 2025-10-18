@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/lib/common/ui/card';
 import { Button } from '@/lib/common/ui/button';
@@ -25,13 +25,13 @@ interface PaymentStatusLocal {
   timestamp?: string;
 }
 
-export default function PaymentProcessingPage() {
+function PaymentProcessingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatusLocal>({
-    status: 'processing',
-    message: 'Processing your payment...'
+    status: 'pending',
+    message: 'Payment submitted. Waiting for admin confirmation...'
   });
   const [orderStatus, setOrderStatus] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -89,7 +89,7 @@ export default function PaymentProcessingPage() {
     const unsubscribePayment = paymentService.listenToPaymentStatus(paymentId, (payment: PaymentStatus | null) => {
       if (payment) {
         setPaymentStatus({
-          status: payment.status as any,
+          status: payment.status as 'pending' | 'completed' | 'failed',
           message: payment.message || 'Payment status updated',
           paymentId: payment.paymentId,
           timestamp: payment.updatedAt.toISOString()
@@ -322,5 +322,13 @@ export default function PaymentProcessingPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function PaymentProcessingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentProcessingPageContent />
+    </Suspense>
   );
 }

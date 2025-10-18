@@ -35,7 +35,6 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
 
   useEffect(() => {
     const unsubscribe = cartService.subscribe((cart) => {
-      console.log('Cart updated in Header:', cart);
       setActualCartItems(cart.totalItems);
     });
     return unsubscribe;
@@ -110,10 +109,7 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
               variant="ghost" 
               size="icon" 
               className="relative"
-              onClick={() => {
-                console.log('Cart button clicked, navigating to /cart');
-                router.push('/cart');
-              }}
+              onClick={() => router.push('/cart')}
             >
               <ShoppingCart className="h-5 w-5" />
               {actualCartItems > 0 && (

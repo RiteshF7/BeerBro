@@ -45,19 +45,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (loading) return;
+    const checkAdminStatus = async () => {
+      if (loading) return;
 
-    if (!user) {
-      router.push('/');
-      return;
-    }
+      if (!user) {
+        router.push('/');
+        return;
+      }
 
-    if (!isAdmin(user)) {
-      router.push('/');
-      return;
-    }
+      const userIsAdmin = await isAdmin(user);
+      if (!userIsAdmin) {
+        router.push('/');
+        return;
+      }
 
-    setIsAuthorized(true);
+      setIsAuthorized(true);
+    };
+
+    checkAdminStatus();
   }, [user, loading, router]);
 
   const handleSignOut = async () => {
