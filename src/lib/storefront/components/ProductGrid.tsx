@@ -62,9 +62,9 @@ function ProductCard({ product }: { product: Product }) {
   const imageSrc = imageError || !product.image ? getProductPlaceholderImage(product.category) : product.image;
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(price);
   };
 
@@ -232,9 +232,9 @@ function HorizontalProductCard({ product }: { product: Product }) {
   const imageSrc = imageError || !product.image ? getProductPlaceholderImage(product.category) : product.image;
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(price);
   };
 

@@ -40,7 +40,7 @@ export function QRCodePayment({ total, onPaymentComplete, onPaymentError, onProc
       const paymentData = {
         type: 'payment',
         amount: total,
-        currency: 'USD',
+        currency: 'INR',
         paymentId,
         merchant: 'BeerBro',
         timestamp: new Date().toISOString(),

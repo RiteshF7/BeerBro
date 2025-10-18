@@ -302,7 +302,7 @@ function PaymentProcessingPageContent() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Amount:</span>
-                    <span className="font-medium">${amount || '0.00'}</span>
+                        <span className="font-medium">₹{amount || '0.00'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Payment Method:</span>
