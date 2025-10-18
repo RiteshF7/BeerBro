@@ -93,7 +93,7 @@ export function AddressManager({
       const userAddresses = await addressService.getUserAddresses(userId);
       setAddresses(userAddresses);
     } catch (error) {
-      console.error('Error loading addresses:', error);
+      console.error('❌ AddressManager: Error loading addresses:', error);
       setError('Failed to load addresses. Please try again.');
     } finally {
       setLoading(false);
@@ -106,7 +106,6 @@ export function AddressManager({
 
     try {
       setError(null);
-      
       if (editingAddress) {
         // Update existing address
         await addressService.updateAddress(editingAddress.id, formData);
@@ -122,7 +121,7 @@ export function AddressManager({
       resetForm();
       setIsDialogOpen(false);
     } catch (error) {
-      console.error('Error saving address:', error);
+      console.error('❌ AddressManager: Error saving address:', error);
       setError('Failed to save address. Please try again.');
     }
   };

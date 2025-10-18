@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export interface Address {
@@ -57,7 +57,7 @@ class AddressService {
       const docRef = await addDoc(collection(db, this.ADDRESSES_COLLECTION), addressDoc);
       return docRef.id;
     } catch (error) {
-      console.error('Error creating address:', error);
+      console.error('❌ AddressService: Error creating address:', error);
       throw error;
     }
   }
@@ -66,7 +66,7 @@ class AddressService {
   async getUserAddresses(userId: string): Promise<Address[]> {
     try {
       if (!db) {
-        console.error('Firestore not initialized');
+        console.error('❌ AddressService: Firestore not initialized');
         return [];
       }
 
@@ -77,14 +77,15 @@ class AddressService {
 
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map(doc => ({
+      const addresses = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         updatedAt: doc.data().updatedAt?.toDate() || new Date(),
       })) as Address[];
+      return addresses;
     } catch (error) {
-      console.error('Error fetching user addresses:', error);
+      console.error('❌ AddressService: Error fetching user addresses:', error);
       return [];
     }
   }
@@ -132,10 +133,10 @@ class AddressService {
       // If setting as default, unset all other default addresses
       if (updates.isDefault) {
         const addressRef = doc(db, this.ADDRESSES_COLLECTION, addressId);
-        const addressDoc = await getDocs(query(collection(db, this.ADDRESSES_COLLECTION), where('__name__', '==', addressId)));
+        const addressDoc = await getDoc(addressRef);
         
-        if (!addressDoc.empty) {
-          const userId = addressDoc.docs[0].data().userId;
+        if (addressDoc.exists()) {
+          const userId = addressDoc.data().userId;
           await this.unsetDefaultAddresses(userId);
         }
       }
@@ -177,10 +178,10 @@ class AddressService {
 
       // Get the address to find the userId
       const addressRef = doc(db, this.ADDRESSES_COLLECTION, addressId);
-      const addressDoc = await getDocs(query(collection(db, this.ADDRESSES_COLLECTION), where('__name__', '==', addressId)));
+      const addressDoc = await getDoc(addressRef);
       
-      if (!addressDoc.empty) {
-        const userId = addressDoc.docs[0].data().userId;
+      if (addressDoc.exists()) {
+        const userId = addressDoc.data().userId;
         
         // Unset all other default addresses
         await this.unsetDefaultAddresses(userId);
