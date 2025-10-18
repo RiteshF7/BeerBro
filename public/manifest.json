@@ -1,7 +1,7 @@
 {
-  "name": "BeerBro - Premium Beverage Store",
-  "short_name": "BeerBro",
-  "description": "Discover the finest selection of craft beers, wines, spirits, and premium beverages from around the world.",
+  "name": "After Twelve - For Players of the Night",
+  "short_name": "After Twelve",
+  "description": "For Players of the Night - Premium beverages and spirits for the night owls.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

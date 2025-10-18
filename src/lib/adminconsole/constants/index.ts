@@ -75,7 +75,7 @@ export const DEFAULT_NAVIGATION_ITEMS: NavigationItem[] = [
  * Default admin layout configuration
  */
 export const DEFAULT_ADMIN_LAYOUT_CONFIG: AdminLayoutConfig = {
-  appTitle: 'BeerBro Admin',
+  appTitle: 'After Twelve Admin',
   userProfile: {
     showAvatar: true,
     showDisplayName: true,

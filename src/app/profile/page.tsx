@@ -12,6 +12,7 @@ import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { User } from 'firebase/auth';
 import { ArrowLeft, Save, User as UserIcon, Mail, Phone, Calendar, Camera, MapPin } from 'lucide-react';
 import { Header } from '@/lib/storefront/components/Header';
+import { CartNotification } from '@/lib/storefront/components/CartNotification';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -340,6 +341,9 @@ export default function ProfilePage() {
           </Card>
         </div>
       </main>
+      
+      {/* Cart Notification */}
+      <CartNotification />
     </div>
   );
 }

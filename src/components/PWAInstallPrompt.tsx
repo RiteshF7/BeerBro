@@ -102,7 +102,7 @@ export default function PWAInstallPrompt() {
               <Smartphone className="w-4 h-4 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-sm">Install BeerBro</h3>
+              <h3 className="font-semibold text-gray-900 text-sm">Install After Twelve</h3>
               <p className="text-xs text-gray-600">Get the app experience</p>
             </div>
           </div>

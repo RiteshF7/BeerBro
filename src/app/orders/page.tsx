@@ -10,6 +10,7 @@ import { ordersService, Order } from '@/lib/storefront/services/orders.service';
 import { cartService } from '@/lib/storefront/services/cart.service';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Header } from '@/lib/storefront/components/Header';
+import { CartNotification } from '@/lib/storefront/components/CartNotification';
 import { 
   Package, 
   Clock, 
@@ -142,6 +143,112 @@ export default function OrdersPage() {
     }
   };
 
+  const createSampleOrder = async () => {
+    if (!userProfile) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Create a sample order for the current user
+      const sampleOrder = {
+        userId: userProfile.uid,
+        userName: userProfile.displayName,
+        userEmail: userProfile.email,
+        items: [
+          {
+            id: 'sample-item-1',
+            product: {
+              id: 'sample-beer-1',
+              name: 'Craft IPA Beer',
+              description: 'Award-winning IPA with tropical fruit notes',
+              price: 15.99,
+              image: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=400&fit=crop&q=80',
+              category: 'Beer',
+              rating: 4.8,
+              reviewCount: 156,
+              inStock: true,
+              isOnSale: false,
+              isNew: false,
+              stockQuantity: 25,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              tags: ['craft', 'ipa'],
+              alcoholContent: 6.5,
+              volume: 355,
+              brand: 'Craft Masters',
+            },
+            quantity: 2,
+            addedAt: new Date(),
+          },
+          {
+            id: 'sample-item-2',
+            product: {
+              id: 'sample-wine-1',
+              name: 'Cabernet Sauvignon',
+              description: 'Rich and full-bodied red wine',
+              price: 29.99,
+              image: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=400&fit=crop&q=80',
+              category: 'Wine',
+              rating: 4.7,
+              reviewCount: 89,
+              inStock: true,
+              isOnSale: false,
+              isNew: false,
+              stockQuantity: 15,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              tags: ['red', 'wine'],
+              alcoholContent: 13.5,
+              volume: 750,
+              brand: 'Vintage Cellars',
+            },
+            quantity: 1,
+            addedAt: new Date(),
+          }
+        ],
+        shippingAddress: {
+          firstName: userProfile.displayName.split(' ')[0] || 'John',
+          lastName: userProfile.displayName.split(' ')[1] || 'Doe',
+          address: '123 Sample Street',
+          city: 'Sample City',
+          state: 'Sample State',
+          zipCode: '12345',
+          country: 'USA',
+          phone: userProfile.phone || '+1234567890',
+        },
+        paymentMethod: {
+          type: 'card' as const,
+          cardNumber: '**** **** **** 1234',
+          expiryDate: '12/25',
+          cvv: '***',
+          cardholderName: userProfile.displayName,
+        },
+        subtotal: 61.97,
+        tax: 4.96,
+        shipping: 0,
+        total: 66.93,
+        status: 'pending' as const,
+        paymentStatus: 'pending' as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // Create the order using the orders service
+      const orderId = await ordersService.createOrder(sampleOrder);
+      
+      if (orderId) {
+        // Reload orders to show the new sample order
+        await loadOrders(userProfile.uid);
+      }
+    } catch (error) {
+      console.error('Error creating sample order:', error);
+      setError('Failed to create sample order. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -197,9 +304,18 @@ export default function OrdersPage() {
                 <p className="text-gray-600 mb-6">
                   You haven&apos;t placed any orders yet. Start shopping to see your orders here.
                 </p>
-                <Button onClick={() => router.push('/')}>
-                  Start Shopping
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button onClick={() => router.push('/')}>
+                    Start Shopping
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => createSampleOrder()}
+                    disabled={!userProfile}
+                  >
+                    Create Sample Order (Test)
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
@@ -303,6 +419,9 @@ export default function OrdersPage() {
           )}
         </div>
       </main>
+      
+      {/* Cart Notification */}
+      <CartNotification />
     </div>
   );
 }

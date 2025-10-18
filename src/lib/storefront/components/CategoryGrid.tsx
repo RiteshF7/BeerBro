@@ -40,9 +40,9 @@ const HARDCODED_CATEGORIES: Category[] = [
     isPopular: false,
   },
   {
-    id: 'whiskey',
-    name: 'Whiskey',
-    description: 'Premium whiskeys including bourbon, scotch, and rye',
+    id: 'whisky',
+    name: 'Whisky',
+    description: 'Premium whiskies including bourbon, scotch, and rye',
     productCount: 0,
     isPopular: true,
   },
@@ -269,7 +269,7 @@ export function CategoryGrid({
         <Button
           variant="outline"
           size="icon"
-          className="fixed top-4 left-4 z-50 bg-white shadow-lg"
+          className="fixed top-20 left-4 z-50 bg-white shadow-lg md:hidden"
           onClick={() => setSidebarOpen(true)}
         >
           <Menu className="h-5 w-5" />

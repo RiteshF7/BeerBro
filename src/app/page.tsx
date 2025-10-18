@@ -5,6 +5,7 @@ import { Header } from '@/lib/storefront/components/Header';
 import { ProductGrid } from '@/lib/storefront/components/ProductGrid';
 import { CategoryGrid } from '@/lib/storefront/components/CategoryGrid';
 import { AuthWrapper } from '@/lib/storefront/components/AuthWrapper';
+import { CartNotification } from '@/lib/storefront/components/CartNotification';
 import { productsService, Product, Category } from '@/lib/storefront/services/products.service';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Button } from "@/lib/common/ui/button";
@@ -245,11 +246,11 @@ function HomeContent() {
         {/* Hero Section */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-            Welcome to BeerBro
+            Welcome to After Twelve
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-4 mb-6">
-            Discover the finest selection of craft beers, wines, and spirits. 
-            From local favorites to international classics, we have something for every taste.
+            For Players of the Night - Premium beverages and spirits for the night owls. 
+            Discover the finest selection of craft beers, wines, and spirits for your evening adventures.
           </p>
           
           {/* Install App Button */}
@@ -335,6 +336,9 @@ function HomeContent() {
           </div>
         </section>
       </main>
+      
+      {/* Cart Notification */}
+      <CartNotification />
     </div>
   );
 }

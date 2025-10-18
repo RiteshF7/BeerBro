@@ -17,32 +17,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BeerBro - Premium Beverage Store",
-  description: "Discover the finest selection of craft beers, wines, spirits, and premium beverages from around the world.",
-  keywords: ["beer", "wine", "spirits", "whiskey", "gin", "vodka", "rum", "tequila", "cocktails", "beverages", "alcohol", "craft beer"],
-  authors: [{ name: "BeerBro Team" }],
-  creator: "BeerBro",
-  publisher: "BeerBro",
+  title: "After Twelve - For Players of the Night",
+  description: "For Players of the Night - Premium beverages and spirits for the night owls.",
+  keywords: ["beer", "wine", "spirits", "whisky", "gin", "vodka", "rum", "tequila", "cocktails", "beverages", "alcohol", "craft beer"],
+  authors: [{ name: "After Twelve Team" }],
+  creator: "After Twelve",
+  publisher: "After Twelve",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://beerbro.app'),
+  metadataBase: new URL('https://aftertwelve.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: "BeerBro - Premium Beverage Store",
-    description: "Discover the finest selection of craft beers, wines, spirits, and premium beverages from around the world.",
-    url: 'https://beerbro.app',
-    siteName: 'BeerBro',
+    title: "After Twelve - For Players of the Night",
+    description: "For Players of the Night - Premium beverages and spirits for the night owls.",
+    url: 'https://aftertwelve.app',
+    siteName: 'After Twelve',
     images: [
       {
         url: '/icons/icon.svg',
         width: 512,
         height: 512,
-        alt: 'BeerBro Logo',
+        alt: 'After Twelve Logo',
       },
     ],
     locale: 'en_US',
@@ -50,8 +50,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "BeerBro - Premium Beverage Store",
-    description: "Discover the finest selection of craft beers, wines, spirits, and premium beverages from around the world.",
+    title: "After Twelve - For Players of the Night",
+    description: "For Players of the Night - Premium beverages and spirits for the night owls.",
     images: ['/icons/icon.svg'],
   },
   robots: {
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'BeerBro',
+    title: 'After Twelve',
   },
 };
 

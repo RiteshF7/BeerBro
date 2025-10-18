@@ -38,9 +38,9 @@ export function LoginPage({ onLoginSuccess, onLoginStart }: LoginPageProps) {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-16 w-16 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-2xl font-bold text-primary-foreground">B</span>
+            <span className="text-2xl font-bold text-primary-foreground">A</span>
           </div>
-          <CardTitle className="text-2xl">Welcome to BeerBro</CardTitle>
+          <CardTitle className="text-2xl">Welcome to After Twelve</CardTitle>
           <CardDescription>
             Sign in to explore our collection of premium beverages
           </CardDescription>

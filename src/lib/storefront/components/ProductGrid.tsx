@@ -16,7 +16,7 @@ const getProductPlaceholderImage = (category: string): string => {
     return 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=400&fit=crop&q=80';
   } else if (categoryLower.includes('wine')) {
     return 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=400&fit=crop&q=80';
-  } else if (categoryLower.includes('spirit') || categoryLower.includes('whiskey') || categoryLower.includes('vodka')) {
+  } else if (categoryLower.includes('spirit') || categoryLower.includes('whisky') || categoryLower.includes('vodka')) {
     return 'https://images.unsplash.com/photo-1551538827-9c037bd4df7b?w=400&h=400&fit=crop&q=80';
   } else if (categoryLower.includes('cocktail')) {
     return 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=400&fit=crop&q=80';
@@ -403,7 +403,7 @@ export function ProductGrid({
       {showTitle && (
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{title}</h2>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 gap-4 sm:gap-6">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

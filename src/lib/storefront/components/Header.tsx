@@ -56,9 +56,9 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
               className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">B</span>
+                <span className="text-primary-foreground font-bold text-lg">A</span>
               </div>
-              <span className="text-lg sm:text-xl font-bold">BeerBro</span>
+              <span className="text-lg sm:text-xl font-bold">After Twelve</span>
             </button>
           </div>
 
