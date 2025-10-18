@@ -37,6 +37,7 @@ function PaymentProcessingPageContent() {
   const [orderStatus, setOrderStatus] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasRedirected, setHasRedirected] = useState(false);
 
   const paymentId = searchParams.get('paymentId');
   const orderId = searchParams.get('orderId');
@@ -97,7 +98,10 @@ function PaymentProcessingPageContent() {
         });
 
         // Only redirect to order success when payment is completed by admin
-        if (payment.status === 'completed') {
+        if (payment.status === 'completed' && !hasRedirected) {
+          // Set redirect flag to prevent multiple redirects
+          setHasRedirected(true);
+          
           // Clear the cart since order is completed
           cartService.clearCart();
           setTimeout(() => {
@@ -109,9 +113,17 @@ function PaymentProcessingPageContent() {
 
     // Monitor order status and payment status if orderId is available
     let orderStatusInterval: NodeJS.Timeout | null = null;
-    if (orderId && orderId !== 'temp') {
+    if (orderId && orderId !== 'temp' && !hasRedirected) {
       const checkOrderStatus = async () => {
         try {
+          // Stop monitoring if we've already redirected
+          if (hasRedirected) {
+            if (orderStatusInterval) {
+              clearInterval(orderStatusInterval);
+            }
+            return;
+          }
+          
           const order = await ordersService.getOrderById(orderId);
           if (order) {
             setOrderStatus(order);
@@ -121,13 +133,16 @@ function PaymentProcessingPageContent() {
               console.log('🔄 PaymentProcessing: Order payment status changed:', order.paymentStatus);
               
               // Update payment status based on order's payment status
-              if (order.paymentStatus === 'completed') {
+              if (order.paymentStatus === 'completed' && !hasRedirected) {
                 setPaymentStatus({
                   status: 'completed',
                   message: 'Payment completed successfully!',
                   paymentId: paymentId,
                   timestamp: new Date().toISOString()
                 });
+                
+                // Set redirect flag to prevent multiple redirects
+                setHasRedirected(true);
                 
                 // Clear cart and redirect to success page
                 cartService.clearCart();

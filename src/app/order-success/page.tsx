@@ -65,39 +65,43 @@ function OrderSuccessPageContent() {
   const paymentId = searchParams.get('paymentId');
 
   useEffect(() => {
+    let orderStatusInterval: NodeJS.Timeout | null = null;
+    
     const authUnsubscribe = authService.subscribe((state) => {
       if (state.profile) {
         setUserProfile(state.profile);
         if (orderId) {
           loadOrderDetails(orderId);
-          startOrderStatusMonitoring(orderId);
+          
+          // Start order status monitoring
+          const checkOrderStatus = async () => {
+            try {
+              const order = await ordersService.getOrderById(orderId);
+              if (order) {
+                setRealTimeOrder(order);
+              }
+            } catch (error) {
+              console.error('Error checking order status:', error);
+            }
+          };
+
+          // Check immediately and then every 10 seconds
+          checkOrderStatus();
+          orderStatusInterval = setInterval(checkOrderStatus, 10000);
         }
       } else if (!state.loading) {
         router.push('/login?returnUrl=/order-success');
       }
     });
 
-    return authUnsubscribe;
-  }, [router, orderId]);
-
-  const startOrderStatusMonitoring = (orderId: string) => {
-    const checkOrderStatus = async () => {
-      try {
-        const order = await ordersService.getOrderById(orderId);
-        if (order) {
-          setRealTimeOrder(order);
-        }
-      } catch (error) {
-        console.error('Error checking order status:', error);
+    return () => {
+      authUnsubscribe();
+      if (orderStatusInterval) {
+        clearInterval(orderStatusInterval);
       }
     };
+  }, [router, orderId]);
 
-    // Check immediately and then every 10 seconds
-    checkOrderStatus();
-    const interval = setInterval(checkOrderStatus, 10000);
-
-    return () => clearInterval(interval);
-  };
 
   const loadOrderDetails = async (orderId: string) => {
     try {
