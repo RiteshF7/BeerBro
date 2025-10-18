@@ -110,50 +110,48 @@ function OrderSuccessPageContent() {
       setLoading(true);
       setError(null);
       
-      // Simulate loading order details
-      // In a real app, this would fetch from your API
-      const mockOrderDetails: OrderDetails = {
-        id: orderId,
-        items: [
-          {
-            product: {
-              name: 'Craft IPA Beer',
-              price: 1299
-            },
-            quantity: 2
+      // Fetch real order details from Firebase
+      const order = await ordersService.getOrderById(orderId);
+      
+      if (!order) {
+        setError('Order not found. Please check your order ID.');
+        return;
+      }
+
+      // Convert Order to OrderDetails format
+      const orderDetails: OrderDetails = {
+        id: order.id,
+        items: order.items.map(item => ({
+          product: {
+            name: item.product.name,
+            price: item.product.price
           },
-          {
-            product: {
-              name: 'Premium Red Wine',
-              price: 2499
-            },
-            quantity: 1
-          }
-        ],
+          quantity: item.quantity
+        })),
         shippingAddress: {
-          firstName: 'John',
-          lastName: 'Doe',
-          address: '123 Main St',
-          city: 'New York',
-          state: 'NY',
-          zipCode: '10001',
-          country: 'USA',
-          phone: '+1-555-0123'
+          firstName: order.shippingAddress.firstName,
+          lastName: order.shippingAddress.lastName,
+          address: order.shippingAddress.address,
+          city: order.shippingAddress.city,
+          state: order.shippingAddress.state,
+          zipCode: order.shippingAddress.zipCode,
+          country: order.shippingAddress.country,
+          phone: order.shippingAddress.phone
         },
         paymentMethod: {
-          type: 'qr_code',
-          paymentId: paymentId || 'PAY_123456789'
+          type: order.paymentMethod.type,
+          paymentId: order.paymentMethod.paymentId || paymentId || 'N/A'
         },
-        subtotal: 5097,
-        tax: 408,
-        shipping: 0,
-        total: 5505,
-        status: 'confirmed',
-        createdAt: new Date(),
-        estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
+        subtotal: order.subtotal,
+        tax: order.tax,
+        shipping: order.shipping,
+        total: order.total,
+        status: order.status,
+        createdAt: order.createdAt,
+        estimatedDelivery: order.estimatedDelivery || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now if not set
       };
 
-      setOrderDetails(mockOrderDetails);
+      setOrderDetails(orderDetails);
     } catch (error) {
       console.error('Error loading order details:', error);
       setError('Failed to load order details. Please try again.');
@@ -393,48 +391,48 @@ function OrderSuccessPageContent() {
         onSignOut={handleSignOut}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 py-4 sm:px-4 sm:py-6 lg:py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Dynamic Status Header */}
+          {/* Dynamic Status Header - Mobile Optimized */}
           {(() => {
             const statusInfo = getStatusInfo(realTimeOrder?.status || orderDetails?.status || 'confirmed');
             return (
-              <div className={`text-center mb-8 p-8 rounded-lg border-2 ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
-                <div className="flex justify-center mb-4">
-                  <div className={`w-16 h-16 ${statusInfo.iconBg} rounded-full flex items-center justify-center`}>
+              <div className={`text-center mb-4 sm:mb-6 lg:mb-8 p-4 sm:p-6 lg:p-8 rounded-lg border-2 ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
+                <div className="flex justify-center mb-3 sm:mb-4">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 ${statusInfo.iconBg} rounded-full flex items-center justify-center`}>
                     {statusInfo.icon}
                   </div>
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{statusInfo.title}</h1>
-                <p className="text-lg text-gray-700 mb-2">{statusInfo.subtitle}</p>
-                <p className="text-gray-600 max-w-2xl mx-auto">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{statusInfo.title}</h1>
+                <p className="text-sm sm:text-base lg:text-lg text-gray-700 mb-2">{statusInfo.subtitle}</p>
+                <p className="text-xs sm:text-sm lg:text-base text-gray-600 max-w-2xl mx-auto">
                   {statusInfo.description}
                 </p>
               </div>
             );
           })()}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Order Details */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               {/* Order Summary */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Package className="h-5 w-5 mr-2" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base sm:text-lg">
+                    <Package className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Order Summary
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
                     {orderDetails.items.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <h4 className="font-medium">{item.product.name}</h4>
-                          <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                      <div key={index} className="flex items-center justify-between p-2 sm:p-3 border rounded-lg">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm sm:text-base truncate">{item.product.name}</h4>
+                          <p className="text-xs sm:text-sm text-gray-600">Qty: {item.quantity}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="font-medium">
+                        <div className="text-right ml-2">
+                          <p className="font-medium text-sm sm:text-base">
                             {formatPrice(item.product.price * item.quantity)}
                           </p>
                         </div>
@@ -446,25 +444,25 @@ function OrderSuccessPageContent() {
 
               {/* Shipping Address */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <MapPin className="h-5 w-5 mr-2" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base sm:text-lg">
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Shipping Address
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="font-medium">
+                <CardContent className="pt-0">
+                  <div className="space-y-1 sm:space-y-2">
+                    <p className="font-medium text-sm sm:text-base">
                       {orderDetails.shippingAddress.firstName} {orderDetails.shippingAddress.lastName}
                     </p>
-                    <p>{orderDetails.shippingAddress.address}</p>
-                    <p>
+                    <p className="text-sm sm:text-base">{orderDetails.shippingAddress.address}</p>
+                    <p className="text-sm sm:text-base">
                       {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.state} {orderDetails.shippingAddress.zipCode}
                     </p>
-                    <p>{orderDetails.shippingAddress.country}</p>
+                    <p className="text-sm sm:text-base">{orderDetails.shippingAddress.country}</p>
                     {orderDetails.shippingAddress.phone && (
-                      <p className="text-sm text-gray-600">
-                        {orderDetails.shippingAddress.phone}
+                      <p className="text-xs sm:text-sm text-gray-600">
+                        📞 {orderDetails.shippingAddress.phone}
                       </p>
                     )}
                   </div>
@@ -473,19 +471,19 @@ function OrderSuccessPageContent() {
 
               {/* Payment Method */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base sm:text-lg">
+                    <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Payment Method
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="font-medium">QR Code Payment</p>
-                    <p className="text-sm text-gray-600">
+                <CardContent className="pt-0">
+                  <div className="space-y-1 sm:space-y-2">
+                    <p className="font-medium text-sm sm:text-base">QR Code Payment</p>
+                    <p className="text-xs sm:text-sm text-gray-600">
                       Payment ID: {orderDetails.paymentMethod.paymentId}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       Status: {realTimeOrder?.paymentStatus || 'completed'}
                     </p>
                   </div>
@@ -494,11 +492,11 @@ function OrderSuccessPageContent() {
             </div>
 
             {/* Order Status & Actions */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Order Status */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                     Order Status
                     {realTimeOrder && (
                       <div className="flex items-center text-xs text-green-600">
@@ -508,7 +506,7 @@ function OrderSuccessPageContent() {
                     )}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="pt-0 space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Current Status:</span>
                     <Badge className={`${getStatusColor(realTimeOrder?.status || orderDetails.status)} flex items-center space-x-1`}>
@@ -598,41 +596,41 @@ function OrderSuccessPageContent() {
 
               {/* Estimated Delivery */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Truck className="h-5 w-5 mr-2" />
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-base sm:text-lg">
+                    <Truck className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Estimated Delivery
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                   <div className="text-center">
-                    <Calendar className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-                    <p className="text-lg font-semibold">{formatDate(orderDetails.estimatedDelivery)}</p>
-                    <p className="text-sm text-gray-600">3-5 business days</p>
+                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 text-blue-500" />
+                    <p className="text-sm sm:text-lg font-semibold">{formatDate(orderDetails.estimatedDelivery)}</p>
+                    <p className="text-xs sm:text-sm text-gray-600">3-5 business days</p>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Order Total */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Order Total</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base sm:text-lg">Order Total</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between">
+                <CardContent className="pt-0 space-y-2">
+                  <div className="flex justify-between text-sm sm:text-base">
                     <span>Subtotal:</span>
                     <span>{formatPrice(orderDetails.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm sm:text-base">
                     <span>Tax:</span>
                     <span>{formatPrice(orderDetails.tax)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm sm:text-base">
                     <span>Shipping:</span>
                     <span>{orderDetails.shipping === 0 ? 'FREE' : formatPrice(orderDetails.shipping)}</span>
                   </div>
                   <Separator />
-                  <div className="flex justify-between font-semibold text-lg">
+                  <div className="flex justify-between font-semibold text-base sm:text-lg">
                     <span>Total:</span>
                     <span>{formatPrice(orderDetails.total)}</span>
                   </div>
@@ -645,10 +643,10 @@ function OrderSuccessPageContent() {
                 const statusInfo = getStatusInfo(currentStatus);
                 
                 return (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     <Button 
                       onClick={handleViewOrder}
-                      className="w-full"
+                      className="w-full text-sm sm:text-base"
                     >
                       <Package className="h-4 w-4 mr-2" />
                       View Order Details
@@ -659,7 +657,7 @@ function OrderSuccessPageContent() {
                       <Button 
                         variant="outline"
                         onClick={() => router.push('/contact')}
-                        className="w-full"
+                        className="w-full text-sm sm:text-base"
                       >
                         <MessageCircle className="h-4 w-4 mr-2" />
                         Leave Review
@@ -670,7 +668,7 @@ function OrderSuccessPageContent() {
                       <Button 
                         variant="outline"
                         onClick={() => router.push('/contact')}
-                        className="w-full"
+                        className="w-full text-sm sm:text-base"
                       >
                         <MessageCircle className="h-4 w-4 mr-2" />
                         Contact Support
@@ -681,7 +679,7 @@ function OrderSuccessPageContent() {
                       <Button 
                         variant="outline"
                         onClick={() => router.push('/tracking')}
-                        className="w-full"
+                        className="w-full text-sm sm:text-base"
                       >
                         <Truck className="h-4 w-4 mr-2" />
                         Track Package
@@ -691,7 +689,7 @@ function OrderSuccessPageContent() {
                     <Button 
                       variant="outline"
                       onClick={handleContinueShopping}
-                      className="w-full"
+                      className="w-full text-sm sm:text-base"
                     >
                       <Home className="h-4 w-4 mr-2" />
                       Continue Shopping
