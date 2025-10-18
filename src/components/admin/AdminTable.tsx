@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@/lib/common/ui/table';
 import { Button } from '@/lib/common/ui/button';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, CheckCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/lib/common/ui/dropdown-menu';
+import { ORDER_STATUSES, ORDER_STATUS_LABELS, PAYMENT_STATUSES, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 
 interface Column<T> {
   key: keyof T;
@@ -31,6 +32,8 @@ interface AdminTableProps<T> {
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
   onView?: (item: T) => void;
+  onQuickStatusChange?: (item: T, status: string) => void;
+  onQuickPaymentStatusChange?: (item: T, paymentStatus: string) => void;
   isLoading?: boolean;
   emptyMessage?: string;
 }
@@ -41,6 +44,8 @@ export function AdminTable<T extends { id: string }>({
   onEdit,
   onDelete,
   onView,
+  onQuickStatusChange,
+  onQuickPaymentStatusChange,
   isLoading = false,
   emptyMessage = 'No data available',
 }: AdminTableProps<T>) {
@@ -154,6 +159,43 @@ export function AdminTable<T extends { id: string }>({
                         Edit
                       </DropdownMenuItem>
                     )}
+                    
+                    {/* Quick Order Status Changes */}
+                    {onQuickStatusChange && 'status' in item && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Order Status</DropdownMenuLabel>
+                        {ORDER_STATUSES.filter(status => status !== (item as { status?: string }).status).map((status) => (
+                          <DropdownMenuItem
+                            key={status}
+                            onClick={() => onQuickStatusChange(item, status)}
+                            className="text-sm"
+                          >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Order: {ORDER_STATUS_LABELS[status]}
+                          </DropdownMenuItem>
+                        ))}
+                      </>
+                    )}
+                    
+                    {/* Quick Payment Status Changes */}
+                    {onQuickPaymentStatusChange && 'paymentStatus' in item && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Payment Status</DropdownMenuLabel>
+                        {PAYMENT_STATUSES.filter(status => status !== (item as { paymentStatus?: string }).paymentStatus).map((status) => (
+                          <DropdownMenuItem
+                            key={status}
+                            onClick={() => onQuickPaymentStatusChange(item, status)}
+                            className="text-sm"
+                          >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Payment: {PAYMENT_STATUS_LABELS[status]}
+                          </DropdownMenuItem>
+                        ))}
+                      </>
+                    )}
+                    
                     {onDelete && (
                       <>
                         <DropdownMenuSeparator />

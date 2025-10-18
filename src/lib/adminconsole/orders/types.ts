@@ -23,6 +23,7 @@ export const orderSchema = z.object({
   items: z.array(orderItemSchema),
   total: z.number().min(0),
   status: z.enum(ORDER_STATUSES).default('pending'),
+  paymentStatus: z.enum(['pending', 'processing', 'completed', 'failed', 'expired']).default('pending'),
   shippingAddress: addressSchema,
 });
 
@@ -30,9 +31,22 @@ export type OrderFormData = z.infer<typeof orderSchema>;
 export type OrderItem = z.infer<typeof orderItemSchema>;
 export type Address = z.infer<typeof addressSchema>;
 
-export interface OrderWithId extends Omit<OrderFormData, 'shippingAddress'> {
+export interface OrderWithId extends Omit<OrderFormData, 'shippingAddress' | 'items' | 'paymentStatus'> {
   id: string;
   createdAt: Date;
   updatedAt: Date;
   shippingAddress?: Address;
+  paymentStatus?: string;
+  // Allow for flexible item structure from Firestore
+  items?: Array<{
+    productId?: string;
+    productName?: string;
+    name?: string;
+    title?: string;
+    quantity?: number;
+    qty?: number;
+    price?: number;
+    unitPrice?: number;
+    [key: string]: unknown; // Allow additional properties
+  }>;
 }

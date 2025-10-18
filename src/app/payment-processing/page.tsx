@@ -17,6 +17,7 @@ import { Header } from '@/lib/storefront/components/Header';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { paymentService, PaymentStatus } from '@/lib/storefront/services/payment.service';
 import { ordersService, Order } from '@/lib/storefront/services/orders.service';
+import { cartService } from '@/lib/storefront/services/cart.service';
 
 interface PaymentStatusLocal {
   status: 'processing' | 'completed' | 'failed' | 'pending';
@@ -97,6 +98,8 @@ function PaymentProcessingPageContent() {
 
         // Only redirect to order success when payment is completed by admin
         if (payment.status === 'completed') {
+          // Clear the cart since order is completed
+          cartService.clearCart();
           setTimeout(() => {
             router.push(`/order-success?orderId=${orderId}&paymentId=${paymentId}`);
           }, 2000);
@@ -104,7 +107,7 @@ function PaymentProcessingPageContent() {
       }
     });
 
-    // Monitor order status if orderId is available
+    // Monitor order status and payment status if orderId is available
     let orderStatusInterval: NodeJS.Timeout | null = null;
     if (orderId && orderId !== 'temp') {
       const checkOrderStatus = async () => {
@@ -112,6 +115,42 @@ function PaymentProcessingPageContent() {
           const order = await ordersService.getOrderById(orderId);
           if (order) {
             setOrderStatus(order);
+            
+            // Check if payment status has changed in the order
+            if (order.paymentStatus) {
+              console.log('🔄 PaymentProcessing: Order payment status changed:', order.paymentStatus);
+              
+              // Update payment status based on order's payment status
+              if (order.paymentStatus === 'completed') {
+                setPaymentStatus({
+                  status: 'completed',
+                  message: 'Payment completed successfully!',
+                  paymentId: paymentId,
+                  timestamp: new Date().toISOString()
+                });
+                
+                // Clear cart and redirect to success page
+                cartService.clearCart();
+                setTimeout(() => {
+                  router.push(`/order-success?orderId=${orderId}&paymentId=${paymentId}`);
+                }, 2000);
+              } else if (order.paymentStatus === 'failed') {
+                setPaymentStatus({
+                  status: 'failed',
+                  message: 'Payment failed. Please try again.',
+                  paymentId: paymentId,
+                  timestamp: new Date().toISOString()
+                });
+              } else if (order.paymentStatus === 'processing') {
+                setPaymentStatus({
+                  status: 'processing',
+                  message: 'Payment is being processed...',
+                  paymentId: paymentId,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+            
             // If order status changes to confirmed/processing, we can show additional info
             if (order.status === 'confirmed' || order.status === 'processing') {
               setPaymentStatus(prev => ({
@@ -125,9 +164,9 @@ function PaymentProcessingPageContent() {
         }
       };
 
-      // Check immediately and then every 5 seconds
+      // Check immediately and then every 3 seconds for faster response
       checkOrderStatus();
-      orderStatusInterval = setInterval(checkOrderStatus, 5000);
+      orderStatusInterval = setInterval(checkOrderStatus, 3000);
     }
 
     return () => {
@@ -270,8 +309,33 @@ function PaymentProcessingPageContent() {
                       </Badge>
                     </div>
                   )}
+                  {orderStatus?.paymentStatus && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Payment Status:</span>
+                      <Badge 
+                        variant={orderStatus.paymentStatus === 'completed' ? 'default' : 
+                                orderStatus.paymentStatus === 'processing' ? 'secondary' : 
+                                orderStatus.paymentStatus === 'failed' ? 'destructive' : 'outline'}
+                        className="text-xs"
+                      >
+                        {orderStatus.paymentStatus}
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* Status Monitoring Indicator */}
+              {orderId && orderId !== 'temp' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-pulse w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm text-blue-700">
+                      Monitoring payment status... Updates every 3 seconds
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Status Badge */}
               <div className="flex justify-center">

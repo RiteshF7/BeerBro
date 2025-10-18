@@ -163,10 +163,36 @@ export default function CheckoutPage() {
     setErrors({ payment: error });
   };
 
-  const handleProceedToPayment = () => {
-    // Navigate to payment processing page
-    const paymentId = paymentMethod.paymentId || `PAY_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    router.push(`/payment-processing?paymentId=${paymentId}&orderId=temp&amount=${cart.total}`);
+  const handleProceedToPayment = async () => {
+    if (!userProfile) return;
+
+    setLoading(true);
+    try {
+      // Create the order first
+      const orderId = await ordersService.createOrder({
+        userId: userProfile.uid,
+        items: cart.items,
+        shippingAddress,
+        paymentMethod,
+        subtotal: cart.subtotal,
+        tax: cart.tax,
+        shipping: cart.shipping,
+        total: cart.total,
+      });
+
+      if (orderId) {
+        // Navigate to payment processing page with the real order ID
+        const paymentId = paymentMethod.paymentId || `PAY_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        router.push(`/payment-processing?paymentId=${paymentId}&orderId=${orderId}&amount=${cart.total}`);
+      } else {
+        setErrors({ general: 'Failed to create order. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      setErrors({ general: 'Failed to create order. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePlaceOrder = async () => {

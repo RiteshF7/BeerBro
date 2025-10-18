@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where, orderBy, limit, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, orderBy, limit, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { CartItem, ShippingAddress, PaymentMethod } from './cart.service';
 
@@ -42,6 +42,8 @@ class OrdersService {
         throw new Error('Firestore not initialized');
       }
 
+      console.log('🔄 OrdersService: Creating order...', { userId: orderData.userId, total: orderData.total });
+
       const orderDoc = {
         ...orderData,
         status: 'pending' as const,
@@ -51,9 +53,10 @@ class OrdersService {
       };
 
       const docRef = await addDoc(collection(db, this.ORDERS_COLLECTION), orderDoc);
+      console.log('✅ OrdersService: Order created successfully', { orderId: docRef.id });
       return docRef.id;
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error('❌ OrdersService: Error creating order:', error);
       throw error;
     }
   }
@@ -95,31 +98,32 @@ class OrdersService {
   async getOrderById(orderId: string): Promise<Order | null> {
     try {
       if (!db) {
-        console.error('Firestore not initialized');
+        console.error('❌ OrdersService: Firestore not initialized');
         return null;
       }
 
-      const q = query(
-        collection(db, this.ORDERS_COLLECTION),
-        where('__name__', '==', orderId)
-      );
+      console.log('🔄 OrdersService: Fetching order by ID...', { orderId });
 
-      const querySnapshot = await getDocs(q);
+      const orderRef = doc(db, this.ORDERS_COLLECTION, orderId);
+      const orderDoc = await getDoc(orderRef);
       
-      if (querySnapshot.empty) {
+      if (!orderDoc.exists()) {
+        console.log('❌ OrdersService: Order not found', { orderId });
         return null;
       }
 
-      const doc = querySnapshot.docs[0];
-      return {
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-        estimatedDelivery: doc.data().estimatedDelivery?.toDate(),
+      const order = {
+        id: orderDoc.id,
+        ...orderDoc.data(),
+        createdAt: orderDoc.data().createdAt?.toDate() || new Date(),
+        updatedAt: orderDoc.data().updatedAt?.toDate() || new Date(),
+        estimatedDelivery: orderDoc.data().estimatedDelivery?.toDate(),
       } as Order;
+
+      console.log('✅ OrdersService: Order found', { orderId, status: order.status, paymentStatus: order.paymentStatus });
+      return order;
     } catch (error) {
-      console.error('Error fetching order:', error);
+      console.error('❌ OrdersService: Error fetching order:', error);
       return null;
     }
   }

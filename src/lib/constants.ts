@@ -55,10 +55,53 @@ export const PRODUCT_CATEGORIES = [
 // Order statuses
 export const ORDER_STATUSES = [
   'pending',
-  'accepted',
-  'rejected',
+  'paid',
+  'preparing',
+  'out_for_delivery',
+  'delivered',
   'failed',
+  'cancelled',
 ] as const;
+
+// Order status labels for display
+export const ORDER_STATUS_LABELS = {
+  pending: 'Pending',
+  paid: 'Paid',
+  preparing: 'Preparing',
+  out_for_delivery: 'Out for Delivery',
+  delivered: 'Delivered',
+  failed: 'Failed',
+  cancelled: 'Cancelled',
+} as const;
+
+// Order status colors for badges
+export const ORDER_STATUS_COLORS = {
+  pending: 'warning',
+  paid: 'success',
+  preparing: 'primary',
+  out_for_delivery: 'primary',
+  delivered: 'success',
+  failed: 'error',
+  cancelled: 'gray',
+} as const;
+
+// Payment statuses
+export const PAYMENT_STATUSES = [
+  'pending',
+  'processing',
+  'completed',
+  'failed',
+  'expired',
+] as const;
+
+// Payment status labels for display
+export const PAYMENT_STATUS_LABELS = {
+  pending: 'Pending',
+  processing: 'Processing',
+  completed: 'Completed',
+  failed: 'Failed',
+  expired: 'Expired',
+} as const;
 
 // User roles
 export const USER_ROLES = [

@@ -25,6 +25,17 @@ export function OrderDetailsDialog({
 }: OrderDetailsDialogProps) {
   if (!order) return null;
 
+  // Debug logging to help identify data structure issues
+  console.log('🔍 OrderDetailsDialog: Order data received:', {
+    id: order.id,
+    status: order.status,
+    total: order.total,
+    items: order.items,
+    itemsLength: order.items?.length,
+    firstItem: order.items?.[0],
+    orderKeys: Object.keys(order)
+  });
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
@@ -67,24 +78,38 @@ export function OrderDetailsDialog({
               Order Items
             </h3>
             <div className="space-y-2">
-              {order.items.map((item, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                  <div>
-                    <p className="font-medium">{item.productName}</p>
-                    <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">${item.price.toFixed(2)}</p>
-                    <p className="text-sm text-gray-600">
-                      Total: ${(item.price * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
+              {order.items && order.items.length > 0 ? (
+                order.items.map((item, index) => {
+                  // Handle different possible property names and ensure we have valid data
+                  const price = item.price || item.unitPrice || 0;
+                  const quantity = item.quantity || item.qty || 0;
+                  const productName = item.productName || item.name || item.title || 'Unknown Product';
+                  const itemTotal = price * quantity;
+                  
+                  return (
+                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                      <div>
+                        <p className="font-medium">{productName}</p>
+                        <p className="text-sm text-gray-600">Qty: {quantity}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${price.toFixed(2)}</p>
+                        <p className="text-sm text-gray-600">
+                          Total: ${itemTotal.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="p-3 bg-gray-50 rounded-md text-center text-gray-500">
+                  No items found in this order
                 </div>
-              ))}
+              )}
             </div>
             <div className="flex justify-between items-center pt-2 border-t">
               <span className="text-lg font-bold">Total:</span>
-              <span className="text-lg font-bold">${order.total.toFixed(2)}</span>
+              <span className="text-lg font-bold">${(order.total || 0).toFixed(2)}</span>
             </div>
           </div>
 

@@ -18,43 +18,43 @@ import {
   SelectValue,
 } from '@/lib/common/ui/select';
 import { OrderWithId } from './types';
-import { ORDER_STATUSES, ORDER_STATUS_LABELS } from '@/lib/constants';
+import { PAYMENT_STATUSES, PAYMENT_STATUS_LABELS } from '@/lib/constants';
 
-interface OrderStatusDialogProps {
+interface PaymentStatusDialogProps {
   order: OrderWithId | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdateStatus: (orderId: string, status: string) => Promise<void>;
+  onUpdatePaymentStatus: (orderId: string, paymentStatus: string) => Promise<void>;
   isLoading?: boolean;
 }
 
-export function OrderStatusDialog({
+export function PaymentStatusDialog({
   order,
   isOpen,
   onClose,
-  onUpdateStatus,
+  onUpdatePaymentStatus,
   isLoading = false,
-}: OrderStatusDialogProps) {
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
+}: PaymentStatusDialogProps) {
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string>('');
 
-  const handleStatusChange = (status: string) => {
-    setSelectedStatus(status);
+  const handlePaymentStatusChange = (paymentStatus: string) => {
+    setSelectedPaymentStatus(paymentStatus);
   };
 
   const handleSubmit = async () => {
-    if (!order || !selectedStatus) return;
+    if (!order || !selectedPaymentStatus) return;
 
     try {
-      await onUpdateStatus(order.id, selectedStatus);
+      await onUpdatePaymentStatus(order.id, selectedPaymentStatus);
       onClose();
-      setSelectedStatus('');
+      setSelectedPaymentStatus('');
     } catch (error) {
-      console.error('Error updating order status:', error);
+      console.error('Error updating payment status:', error);
     }
   };
 
   const handleClose = () => {
-    setSelectedStatus('');
+    setSelectedPaymentStatus('');
     onClose();
   };
 
@@ -64,30 +64,30 @@ export function OrderStatusDialog({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle>Update Order Status</DialogTitle>
+          <DialogTitle>Update Payment Status</DialogTitle>
           <DialogDescription>
-            Change the status for order #{order.id.slice(-8)}
+            Change the payment status for order #{order.id.slice(-8)}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Current Status</label>
+            <label className="text-sm font-medium">Current Payment Status</label>
             <div className="p-2 bg-gray-100 rounded-md">
-              <span>{ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] || order.status}</span>
+              <span>{PAYMENT_STATUS_LABELS[order.paymentStatus as keyof typeof PAYMENT_STATUS_LABELS] || order.paymentStatus || 'No status'}</span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">New Status</label>
-            <Select value={selectedStatus} onValueChange={handleStatusChange}>
+            <label className="text-sm font-medium">New Payment Status</label>
+            <Select value={selectedPaymentStatus} onValueChange={handlePaymentStatusChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select new status" />
+                <SelectValue placeholder="Select new payment status" />
               </SelectTrigger>
               <SelectContent>
-                {ORDER_STATUSES.map((status) => (
+                {PAYMENT_STATUSES.map((status) => (
                   <SelectItem key={status} value={status}>
-                    {ORDER_STATUS_LABELS[status]}
+                    {PAYMENT_STATUS_LABELS[status]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -101,12 +101,13 @@ export function OrderStatusDialog({
           </Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={!selectedStatus || isLoading}
+            disabled={!selectedPaymentStatus || isLoading}
           >
-            {isLoading ? 'Updating...' : 'Update Status'}
+            {isLoading ? 'Updating...' : 'Update Payment Status'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+

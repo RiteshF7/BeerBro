@@ -134,6 +134,43 @@ export async function updateOrderStatus(
   });
 }
 
+export async function updatePaymentStatus(
+  id: string, 
+  paymentStatus: string
+): Promise<void> {
+  if (!db) throw new Error('Firestore not initialized');
+  
+  const orderRef = doc(db, ORDERS_COLLECTION, id);
+  await updateDoc(orderRef, {
+    paymentStatus,
+    updatedAt: serverTimestamp(),
+  });
+
+  // Also update the payment record if it exists
+  try {
+    // Find the payment record for this order
+    const paymentsRef = collection(db, 'payments');
+    const q = query(paymentsRef, where('orderId', '==', id));
+    const paymentsSnapshot = await getDocs(q);
+    
+    if (!paymentsSnapshot.empty) {
+      const paymentDoc = paymentsSnapshot.docs[0];
+      const paymentRef = doc(db, 'payments', paymentDoc.id);
+      
+      await updateDoc(paymentRef, {
+        status: paymentStatus,
+        updatedAt: serverTimestamp(),
+        message: `Payment status updated to ${paymentStatus}`
+      });
+      
+      console.log('✅ OrdersAPI: Updated payment record status to:', paymentStatus);
+    }
+  } catch (error) {
+    console.error('❌ OrdersAPI: Error updating payment record:', error);
+    // Don't throw error here as the order update was successful
+  }
+}
+
 export async function updateOrder(
   id: string,
   orderData: Partial<OrderFormData>

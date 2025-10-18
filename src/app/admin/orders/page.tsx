@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { AdminTable } from '@/components/admin/AdminTable';
 import { OrderStatusDialog } from '@/lib/adminconsole/orders/OrderStatusDialog';
+import { PaymentStatusDialog } from '@/lib/adminconsole/orders/PaymentStatusDialog';
 import { OrderDetailsDialog } from '@/lib/adminconsole/orders/OrderDetailsDialog';
 import { OrderWithId } from '@/lib/adminconsole/orders/types';
-import { getOrders, updateOrderStatus, deleteOrder } from '@/lib/adminconsole/orders/api';
+import { getOrders, updateOrderStatus, updatePaymentStatus, deleteOrder } from '@/lib/adminconsole/orders/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/lib/common/ui/tabs';
 import { StatusBadge } from '@/components/admin/StatusBadge';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ export default function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithId | null>(null);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isPaymentStatusDialogOpen, setIsPaymentStatusDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
@@ -42,11 +44,20 @@ export default function OrdersPage() {
     },
     {
       key: 'status' as keyof OrderWithId,
-      label: 'Status',
+      label: 'Order Status',
       render: (value: unknown) => {
         const status = value as string;
         if (!status) return <span className="text-gray-500">No status</span>;
-        return <StatusBadge status={status as 'pending' | 'accepted' | 'rejected' | 'failed'} />;
+        return <StatusBadge status={status} />;
+      },
+    },
+    {
+      key: 'paymentStatus' as keyof OrderWithId,
+      label: 'Payment Status',
+      render: (value: unknown) => {
+        const paymentStatus = value as string;
+        if (!paymentStatus) return <span className="text-gray-500">No payment status</span>;
+        return <StatusBadge status={paymentStatus} />;
       },
     },
     {
@@ -104,6 +115,28 @@ export default function OrdersPage() {
     }
   };
 
+  const handleQuickStatusChange = async (order: OrderWithId, status: string) => {
+    await handleUpdateStatus(order.id, status);
+  };
+
+  const handleUpdatePaymentStatus = async (orderId: string, paymentStatus: string) => {
+    try {
+      setIsUpdatingStatus(true);
+      await updatePaymentStatus(orderId, paymentStatus);
+      toast.success('Payment status updated successfully');
+      await loadOrders();
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      toast.error('Failed to update payment status');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  const handleQuickPaymentStatusChange = async (order: OrderWithId, paymentStatus: string) => {
+    await handleUpdatePaymentStatus(order.id, paymentStatus);
+  };
+
   const handleEditOrder = (order: OrderWithId) => {
     setSelectedOrder(order);
     setIsStatusDialogOpen(true);
@@ -134,6 +167,11 @@ export default function OrdersPage() {
     setSelectedOrder(null);
   };
 
+  const handleClosePaymentStatusDialog = () => {
+    setIsPaymentStatusDialogOpen(false);
+    setSelectedOrder(null);
+  };
+
   const handleCloseDetailsDialog = () => {
     setIsDetailsDialogOpen(false);
     setSelectedOrder(null);
@@ -153,9 +191,12 @@ export default function OrdersPage() {
     return {
       all: orders.length,
       pending: orders.filter(o => o.status === 'pending').length,
-      accepted: orders.filter(o => o.status === 'accepted').length,
-      rejected: orders.filter(o => o.status === 'rejected').length,
+      paid: orders.filter(o => o.status === 'paid').length,
+      preparing: orders.filter(o => o.status === 'preparing').length,
+      out_for_delivery: orders.filter(o => o.status === 'out_for_delivery').length,
+      delivered: orders.filter(o => o.status === 'delivered').length,
       failed: orders.filter(o => o.status === 'failed').length,
+      cancelled: orders.filter(o => o.status === 'cancelled').length,
     };
   };
 
@@ -171,21 +212,30 @@ export default function OrdersPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="all">
             All ({orderCounts.all})
           </TabsTrigger>
           <TabsTrigger value="pending">
             Pending ({orderCounts.pending})
           </TabsTrigger>
-          <TabsTrigger value="accepted">
-            Accepted ({orderCounts.accepted})
+          <TabsTrigger value="paid">
+            Paid ({orderCounts.paid})
           </TabsTrigger>
-          <TabsTrigger value="rejected">
-            Rejected ({orderCounts.rejected})
+          <TabsTrigger value="preparing">
+            Preparing ({orderCounts.preparing})
+          </TabsTrigger>
+          <TabsTrigger value="out_for_delivery">
+            Out for Delivery ({orderCounts.out_for_delivery})
+          </TabsTrigger>
+          <TabsTrigger value="delivered">
+            Delivered ({orderCounts.delivered})
           </TabsTrigger>
           <TabsTrigger value="failed">
             Failed ({orderCounts.failed})
+          </TabsTrigger>
+          <TabsTrigger value="cancelled">
+            Cancelled ({orderCounts.cancelled})
           </TabsTrigger>
         </TabsList>
 
@@ -196,6 +246,8 @@ export default function OrdersPage() {
             onEdit={handleEditOrder}
             onView={handleViewOrder}
             onDelete={handleDeleteOrder}
+            onQuickStatusChange={handleQuickStatusChange}
+            onQuickPaymentStatusChange={handleQuickPaymentStatusChange}
             isLoading={isLoading}
             emptyMessage="No orders found."
           />
@@ -207,6 +259,14 @@ export default function OrdersPage() {
         isOpen={isStatusDialogOpen}
         onClose={handleCloseStatusDialog}
         onUpdateStatus={handleUpdateStatus}
+        isLoading={isUpdatingStatus}
+      />
+
+      <PaymentStatusDialog
+        order={selectedOrder}
+        isOpen={isPaymentStatusDialogOpen}
+        onClose={handleClosePaymentStatusDialog}
+        onUpdatePaymentStatus={handleUpdatePaymentStatus}
         isLoading={isUpdatingStatus}
       />
 
