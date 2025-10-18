@@ -1,4 +1,5 @@
-import { apiService } from './api.service';
+import { collection, addDoc, getDocs, query, where, orderBy, limit, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { CartItem, ShippingAddress, PaymentMethod, Order } from './cart.service';
 
 export interface CreateOrderData {
@@ -19,8 +20,19 @@ class OrdersService {
   // Create a new order
   async createOrder(orderData: CreateOrderData): Promise<string | null> {
     try {
-      const result = await apiService.createOrder(orderData) as { id: string };
-      return result.id;
+      if (!db) {
+        throw new Error('Firestore not initialized');
+      }
+
+      const orderDoc = {
+        ...orderData,
+        status: 'pending' as const,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      const docRef = await addDoc(collection(db, this.ORDERS_COLLECTION), orderDoc);
+      return docRef.id;
     } catch (error) {
       console.error('Error creating order:', error);
       throw error;
@@ -30,8 +42,30 @@ class OrdersService {
   // Get orders for a specific user
   async getUserOrders(userId: string, limitCount?: number): Promise<Order[]> {
     try {
-      const orders = await apiService.getOrders({ userId, limit: limitCount }) as Order[];
-      return orders;
+      if (!db) {
+        console.error('Firestore not initialized');
+        return [];
+      }
+
+      let q = query(
+        collection(db, this.ORDERS_COLLECTION),
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc')
+      );
+
+      if (limitCount) {
+        q = query(q, limit(limitCount));
+      }
+
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        estimatedDelivery: doc.data().estimatedDelivery?.toDate(),
+      })) as Order[];
     } catch (error) {
       console.error('Error fetching user orders:', error);
       return [];
@@ -41,8 +75,30 @@ class OrdersService {
   // Get a specific order by ID
   async getOrderById(orderId: string): Promise<Order | null> {
     try {
-      const order = await apiService.getOrder(orderId) as Order;
-      return order;
+      if (!db) {
+        console.error('Firestore not initialized');
+        return null;
+      }
+
+      const q = query(
+        collection(db, this.ORDERS_COLLECTION),
+        where('__name__', '==', orderId)
+      );
+
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        return null;
+      }
+
+      const doc = querySnapshot.docs[0];
+      return {
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        estimatedDelivery: doc.data().estimatedDelivery?.toDate(),
+      } as Order;
     } catch (error) {
       console.error('Error fetching order:', error);
       return null;
@@ -55,8 +111,13 @@ class OrdersService {
     estimatedDelivery?: Date;
   }): Promise<void> {
     try {
+      if (!db) {
+        throw new Error('Firestore not initialized');
+      }
+
       const updateData: Record<string, unknown> = {
         status,
+        updatedAt: serverTimestamp(),
       };
 
       if (additionalData?.trackingNumber) {
@@ -67,7 +128,8 @@ class OrdersService {
         updateData.estimatedDelivery = additionalData.estimatedDelivery;
       }
 
-      await apiService.updateOrder(orderId, updateData);
+      const orderRef = doc(db, this.ORDERS_COLLECTION, orderId);
+      await updateDoc(orderRef, updateData);
     } catch (error) {
       console.error('Error updating order status:', error);
       throw error;
@@ -77,8 +139,29 @@ class OrdersService {
   // Get all orders (admin only)
   async getAllOrders(limitCount?: number): Promise<Order[]> {
     try {
-      const orders = await apiService.getOrders({ limit: limitCount }) as Order[];
-      return orders;
+      if (!db) {
+        console.error('Firestore not initialized');
+        return [];
+      }
+
+      let q = query(
+        collection(db, this.ORDERS_COLLECTION),
+        orderBy('createdAt', 'desc')
+      );
+
+      if (limitCount) {
+        q = query(q, limit(limitCount));
+      }
+
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        estimatedDelivery: doc.data().estimatedDelivery?.toDate(),
+      })) as Order[];
     } catch (error) {
       console.error('Error fetching all orders:', error);
       return [];
@@ -88,8 +171,30 @@ class OrdersService {
   // Get orders by status
   async getOrdersByStatus(status: Order['status'], limitCount?: number): Promise<Order[]> {
     try {
-      const orders = await apiService.getOrders({ status, limit: limitCount }) as Order[];
-      return orders;
+      if (!db) {
+        console.error('Firestore not initialized');
+        return [];
+      }
+
+      let q = query(
+        collection(db, this.ORDERS_COLLECTION),
+        where('status', '==', status),
+        orderBy('createdAt', 'desc')
+      );
+
+      if (limitCount) {
+        q = query(q, limit(limitCount));
+      }
+
+      const querySnapshot = await getDocs(q);
+      
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        estimatedDelivery: doc.data().estimatedDelivery?.toDate(),
+      })) as Order[];
     } catch (error) {
       console.error('Error fetching orders by status:', error);
       return [];
