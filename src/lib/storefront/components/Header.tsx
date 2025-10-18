@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/lib/common/ui/dropdown-menu';
-import { Search, ShoppingCart, User, Menu, LogOut, Settings, UserCircle } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, LogOut, Settings, UserCircle, Package } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cartService } from '../services/cart.service';
 import InstallAppButton from '@/components/InstallAppButton';
@@ -141,6 +141,10 @@ export function Header({ onSearch, cartItems = 0, user, onSignOut }: HeaderProps
                   <DropdownMenuItem onClick={() => router.push('/profile')}>
                     <UserCircle className="mr-2 h-4 w-4" />
                     <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/orders')}>
+                    <Package className="mr-2 h-4 w-4" />
+                    <span>My Orders</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />

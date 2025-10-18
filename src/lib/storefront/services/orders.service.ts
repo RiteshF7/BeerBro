@@ -1,6 +1,23 @@
 import { collection, addDoc, getDocs, query, where, orderBy, limit, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { CartItem, ShippingAddress, PaymentMethod, Order } from './cart.service';
+import { CartItem, ShippingAddress, PaymentMethod } from './cart.service';
+
+export interface Order {
+  id: string;
+  userId: string;
+  items: CartItem[];
+  shippingAddress: ShippingAddress;
+  paymentMethod: PaymentMethod;
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  total: number;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  createdAt: Date;
+  updatedAt: Date;
+  trackingNumber?: string;
+  estimatedDelivery?: Date;
+}
 
 export interface CreateOrderData {
   userId: string;

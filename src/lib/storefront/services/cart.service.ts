@@ -247,6 +247,24 @@ class CartService {
     return this.cart.subtotal >= this.FREE_SHIPPING_THRESHOLD;
   }
 
+  // Reorder items from a previous order
+  async reorderItems(orderItems: CartItem[]): Promise<void> {
+    try {
+      // Clear current cart
+      this.clearCart();
+      
+      // Add each item from the order
+      for (const orderItem of orderItems) {
+        await this.addItem(orderItem.product, orderItem.quantity);
+      }
+      
+      console.log('Reorder completed:', this.cart);
+    } catch (error) {
+      console.error('Error reordering items:', error);
+      throw error;
+    }
+  }
+
   // Get remaining amount for free shipping
   getRemainingForFreeShipping(): number {
     const remaining = this.FREE_SHIPPING_THRESHOLD - this.cart.subtotal;
