@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AdminStats } from '@/components/admin/AdminStats';
+// import { AdminStats } from '@/components/admin/AdminStats';
 import { getProducts } from '@/lib/adminconsole/products/api';
 import { getOrders } from '@/lib/adminconsole/orders/api';
 import { getUsers } from '@/lib/adminconsole/users/api';
@@ -70,7 +70,25 @@ export default function AdminDashboard() {
         <p className="text-gray-600">Overview of your admin console</p>
       </div>
 
-      <AdminStats stats={stats} />
+        {/* <AdminStats stats={stats} /> */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold">Total Products</h3>
+            <p className="text-3xl font-bold text-blue-600">{stats.totalProducts}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold">Total Orders</h3>
+            <p className="text-3xl font-bold text-green-600">{stats.totalOrders}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold">Total Users</h3>
+            <p className="text-3xl font-bold text-purple-600">{stats.totalUsers}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold">Total Revenue</h3>
+            <p className="text-3xl font-bold text-orange-600">₹{stats.totalRevenue.toLocaleString()}</p>
+          </div>
+        </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="bg-white p-6 rounded-lg border">

@@ -179,9 +179,9 @@ function PaymentProcessingPageContent() {
         }
       };
 
-      // Check immediately and then every 3 seconds for faster response
+      // Check immediately and then every 10 seconds to reduce API calls
       checkOrderStatus();
-      orderStatusInterval = setInterval(checkOrderStatus, 3000);
+      orderStatusInterval = setInterval(checkOrderStatus, 10000);
     }
 
     return () => {
@@ -346,7 +346,7 @@ function PaymentProcessingPageContent() {
                   <div className="flex items-center space-x-2">
                     <div className="animate-pulse w-2 h-2 bg-blue-500 rounded-full"></div>
                     <span className="text-sm text-blue-700">
-                      Monitoring payment status... Updates every 3 seconds
+                      Monitoring payment status... Updates every 10 seconds
                     </span>
                   </div>
                 </div>

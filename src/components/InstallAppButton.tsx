@@ -39,17 +39,27 @@ export default function InstallAppButton({
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event fired!', e);
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
     // Listen for app installed event
     const handleAppInstalled = () => {
+      console.log('App installed event fired!');
       setIsInstalled(true);
       setDeferredPrompt(null);
     };
 
     if (typeof window !== 'undefined') {
+      // Check if PWA is installable
+      console.log('PWA installability check:', {
+        hasServiceWorker: 'serviceWorker' in navigator,
+        hasManifest: document.querySelector('link[rel="manifest"]') !== null,
+        isHTTPS: location.protocol === 'https:' || location.hostname === 'localhost',
+        isStandalone: window.matchMedia('(display-mode: standalone)').matches
+      });
+
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.addEventListener('appinstalled', handleAppInstalled);
 
@@ -61,48 +71,58 @@ export default function InstallAppButton({
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      // Check if we're in a supported browser
-      if (typeof window === 'undefined') return;
-      
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      
-      if (isDevelopment) {
-        alert('PWA installation is disabled in development mode. Build and run in production to test PWA installation.');
-        return;
-      }
-      
-      if (isIOS && !isInStandaloneMode) {
-        alert('To install this app on iOS, tap the Share button and then "Add to Home Screen".');
-        return;
-      }
-      
-      // For other browsers, show instructions
-      alert('Install prompt not available. Please use your browser\'s menu to "Install App" or "Add to Home Screen".');
+    if (typeof window === 'undefined') return;
+    
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    // Handle iOS installation
+    if (isIOS && !isInStandaloneMode) {
+      alert('To install this app on iOS, tap the Share button and then "Add to Home Screen".');
       return;
     }
-
-    try {
-      setIsInstalling(true);
-      await deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      
-      if (outcome === 'accepted') {
-        console.log('PWA installed successfully');
-        setIsInstalled(true);
-      } else {
-        console.log('PWA installation dismissed');
-      }
-      
-      setDeferredPrompt(null);
-    } catch (error) {
-      console.error('Error installing PWA:', error);
-      alert('Failed to install app. Please try again or use your browser menu to install.');
-    } finally {
-      setIsInstalling(false);
+    
+    // Handle development mode
+    if (isDevelopment) {
+      alert('PWA installation is disabled in development mode. Build and run in production to test PWA installation.');
+      return;
     }
+    
+    // Handle case where we have a deferred prompt (Chrome/Edge)
+    if (deferredPrompt) {
+      try {
+        setIsInstalling(true);
+        console.log('Triggering install prompt...');
+        
+        // Show the install prompt
+        await deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        console.log('User choice:', outcome);
+        
+        if (outcome === 'accepted') {
+          console.log('PWA installed successfully');
+          setIsInstalled(true);
+        } else {
+          console.log('PWA installation dismissed');
+        }
+        
+        // Clear the deferred prompt so it can't be used again
+        setDeferredPrompt(null);
+      } catch (error) {
+        console.error('Error installing PWA:', error);
+        alert('Failed to install app. Please try again or use your browser menu to install.');
+      } finally {
+        setIsInstalling(false);
+      }
+      return;
+    }
+    
+    // Fallback for browsers that don't fire beforeinstallprompt
+    alert('Install prompt not available. Please use your browser\'s menu to "Install App" or "Add to Home Screen".');
   };
 
   // Don't show if already installed
@@ -118,9 +138,9 @@ export default function InstallAppButton({
   const isDevelopment = process.env.NODE_ENV === 'development';
   
   // Show button if:
-  // 1. We have a deferred prompt (Chrome/Edge)
+  // 1. We have a deferred prompt (Chrome/Edge) - this is the main case
   // 2. We're on iOS and not in standalone mode
-  // 3. We're in production and PWA is installable
+  // 3. We're in production and PWA is installable (fallback for browsers that don't fire beforeinstallprompt)
   // Note: Hidden in development mode since PWA is disabled
   const shouldShow = deferredPrompt || (isIOS && !isInStandaloneMode) || (!isDevelopment && !isInStandaloneMode && typeof window !== 'undefined' && 'serviceWorker' in navigator);
 
@@ -143,7 +163,7 @@ export default function InstallAppButton({
     if (isInstalling) {
       return (
         <>
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
           {showText && <span>Installing...</span>}
         </>
       );
@@ -151,7 +171,7 @@ export default function InstallAppButton({
 
     return (
       <>
-        <Download className="w-4 h-4" />
+        <Download className="w-4 h-4 text-current" />
         {showText && <span>Install App</span>}
       </>
     );

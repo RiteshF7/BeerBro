@@ -87,9 +87,9 @@ function OrderSuccessPageContent() {
             }
           };
 
-          // Check immediately and then every 10 seconds
+          // Check immediately and then every 30 seconds to reduce API calls
           checkOrderStatus();
-          orderStatusInterval = setInterval(checkOrderStatus, 10000);
+          orderStatusInterval = setInterval(checkOrderStatus, 30000);
         }
       } else if (!state.loading) {
         router.push('/login?returnUrl=/order-success');
