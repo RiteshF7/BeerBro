@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/lib/common/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/lib/common/ui/card';
 import { Badge } from '@/lib/common/ui/badge';
-import { Input } from '@/lib/common/ui/input';
-import { Label } from '@/lib/common/ui/label';
+// import { Input } from '@/lib/common/ui/input';
+// import { Label } from '@/lib/common/ui/label';
 import { Separator } from '@/lib/common/ui/separator';
-import { cartService, Cart, CartItem } from '@/lib/storefront/services/cart.service';
+import { cartService, Cart } from '@/lib/storefront/services/cart.service';
 import { authService, UserProfile } from '@/lib/storefront/auth/authService';
 import { Header } from '@/lib/storefront/components/Header';
 import { 
@@ -27,7 +27,7 @@ export default function CartPage() {
   const router = useRouter();
   const [cart, setCart] = useState<Cart>(cartService.getCart());
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = cartService.subscribe((cartData) => {

@@ -27,7 +27,7 @@ function LoginContent() {
     return unsubscribe;
   }, [router, searchParams, isLoggingIn, hasCheckedAuth]);
 
-  const handleLoginSuccess = (user: User, isNewUser: boolean) => {
+  const handleLoginSuccess = (_user: User, _isNewUser: boolean) => {
     setIsLoggingIn(false);
     // Redirect to intended destination or home page after successful login
     const returnUrl = searchParams.get('returnUrl') || '/';

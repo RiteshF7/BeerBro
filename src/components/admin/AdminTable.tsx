@@ -44,6 +44,19 @@ export function AdminTable<T extends { id: string }>({
   isLoading = false,
   emptyMessage = 'No data available',
 }: AdminTableProps<T>) {
+  console.log('📋 AdminTable: Component rendered with props:', {
+    dataLength: data.length,
+    isLoading,
+    emptyMessage,
+    hasOnEdit: !!onEdit,
+    hasOnDelete: !!onDelete,
+    hasOnView: !!onView,
+    columnsCount: columns.length
+  });
+  
+  if (data.length > 0) {
+    console.log('📋 AdminTable: Sample data item:', data[0]);
+  }
   if (isLoading) {
     return (
       <div className="rounded-md border">

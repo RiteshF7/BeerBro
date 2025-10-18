@@ -1,7 +1,5 @@
 import { auth } from './firebase';
 import { User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from './firebase';
 
 export const isAdmin = async (user: User | null): Promise<boolean> => {
   if (!user) {
@@ -10,28 +8,14 @@ export const isAdmin = async (user: User | null): Promise<boolean> => {
   }
   
   try {
-    if (!db) {
-      console.error('isAdmin: Firestore not initialized');
-      return false;
-    }
-    
-    // Check user role from Firestore document
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
-    
-    if (!userDoc.exists()) {
-      console.log('isAdmin: User document not found in Firestore');
-      return false;
-    }
-    
-    const userData = userDoc.data();
-    const userRole = userData.role;
-    
+    // Force refresh the token to get latest claims
+    const idTokenResult = await user.getIdTokenResult(true);
+    console.log('isAdmin: User claims:', idTokenResult.claims);
+    console.log('isAdmin: User role from custom claims:', idTokenResult.claims.role);
     console.log('isAdmin: User email:', user.email);
     console.log('isAdmin: User UID:', user.uid);
-    console.log('isAdmin: User role from Firestore:', userRole);
     
-    const isAdminUser = userRole === 'admin';
+    const isAdminUser = idTokenResult.claims.role === 'admin';
     console.log('isAdmin: Is admin?', isAdminUser);
     
     return isAdminUser;

@@ -58,14 +58,31 @@ export default function OrdersPage() {
 
   const loadOrders = async () => {
     try {
+      console.log('🔄 OrdersPage: Starting to load orders...');
       setIsLoading(true);
+      
       const data = await getOrders();
+      console.log('📊 OrdersPage: Raw orders data received:', data);
+      console.log('📊 OrdersPage: Number of orders:', data.length);
+      
+      if (data.length > 0) {
+        console.log('📊 OrdersPage: First order sample:', data[0]);
+        console.log('📊 OrdersPage: Order keys:', Object.keys(data[0]));
+      }
+      
       setOrders(data);
+      console.log('✅ OrdersPage: Orders state updated successfully');
     } catch (error) {
-      console.error('Error loading orders:', error);
+      console.error('❌ OrdersPage: Error loading orders:', error);
+      console.error('❌ OrdersPage: Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown'
+      });
       toast.error('Failed to load orders');
     } finally {
       setIsLoading(false);
+      console.log('🏁 OrdersPage: Loading completed');
     }
   };
 
@@ -126,6 +143,11 @@ export default function OrdersPage() {
   const filteredOrders = activeTab === 'all' 
     ? orders 
     : orders.filter(order => order.status === activeTab);
+
+  console.log('🔍 OrdersPage: Filtering orders for tab:', activeTab);
+  console.log('🔍 OrdersPage: Total orders:', orders.length);
+  console.log('🔍 OrdersPage: Filtered orders:', filteredOrders.length);
+  console.log('🔍 OrdersPage: Filtered orders data:', filteredOrders);
 
   const getOrderCounts = () => {
     return {

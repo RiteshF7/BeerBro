@@ -10,11 +10,9 @@ import {
   CheckCircle, 
   Package, 
   Truck, 
-  Clock,
   MapPin,
   CreditCard,
   Calendar,
-  ArrowRight,
   Home,
   AlertCircle
 } from 'lucide-react';
