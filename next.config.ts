@@ -9,7 +9,7 @@ export default withPWA({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
+  disable: process.env.NODE_ENV === 'development', // Keep PWA disabled in development to avoid conflicts
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

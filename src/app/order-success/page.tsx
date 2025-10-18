@@ -581,7 +581,7 @@ function OrderSuccessPageContent() {
                     const statusInfo = getStatusInfo(realTimeOrder?.status || orderDetails?.status || 'confirmed');
                     return (
                       <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">What's Next:</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">What&apos;s Next:</h4>
                         <ul className="space-y-1">
                           {statusInfo.nextSteps.map((step, index) => (
                             <li key={index} className="text-xs text-gray-600 flex items-center">

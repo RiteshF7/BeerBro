@@ -67,6 +67,12 @@ export default function InstallAppButton({
       
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      
+      if (isDevelopment) {
+        alert('PWA installation is disabled in development mode. Build and run in production to test PWA installation.');
+        return;
+      }
       
       if (isIOS && !isInStandaloneMode) {
         alert('To install this app on iOS, tap the Share button and then "Add to Home Screen".');
@@ -114,8 +120,9 @@ export default function InstallAppButton({
   // Show button if:
   // 1. We have a deferred prompt (Chrome/Edge)
   // 2. We're on iOS and not in standalone mode
-  // 3. We're in development mode
-  const shouldShow = deferredPrompt || (isIOS && !isInStandaloneMode) || isDevelopment;
+  // 3. We're in production and PWA is installable
+  // Note: Hidden in development mode since PWA is disabled
+  const shouldShow = deferredPrompt || (isIOS && !isInStandaloneMode) || (!isDevelopment && !isInStandaloneMode && typeof window !== 'undefined' && 'serviceWorker' in navigator);
 
   console.log('InstallAppButton render:', { 
     isDevelopment, 

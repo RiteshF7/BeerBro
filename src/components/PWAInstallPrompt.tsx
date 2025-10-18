@@ -44,9 +44,14 @@ export default function PWAInstallPrompt() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Show install prompt after a delay if not dismissed before
+    // Show install prompt after a delay if not dismissed before and PWA is installable
     const timer = setTimeout(() => {
-      if (!localStorage.getItem('pwa-install-dismissed') && !isInstalled) {
+      const isDismissed = localStorage.getItem('pwa-install-dismissed');
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const hasServiceWorker = 'serviceWorker' in navigator;
+      
+      // Don't show install prompt in development mode since PWA is disabled
+      if (!isDismissed && !isInstalled && !isDevelopment && hasServiceWorker) {
         setShowInstallPrompt(true);
       }
     }, 5000);

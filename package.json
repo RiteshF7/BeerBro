@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "build:pwa": "next build && next start",
     "lint": "eslint",
     "firebase:seed": "node scripts/seed-firestore-cli.js",
     "firebase:deploy": "firebase deploy",
