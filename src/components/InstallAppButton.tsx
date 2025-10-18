@@ -32,7 +32,7 @@ export default function InstallAppButton({
 
   useEffect(() => {
     // Check if app is already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
       return;
     }
@@ -49,18 +49,22 @@ export default function InstallAppButton({
       setDeferredPrompt(null);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.addEventListener('appinstalled', handleAppInstalled);
 
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-    };
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.removeEventListener('appinstalled', handleAppInstalled);
+      };
+    }
   }, []);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
       // Check if we're in a supported browser
+      if (typeof window === 'undefined') return;
+      
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
       
@@ -101,6 +105,8 @@ export default function InstallAppButton({
   }
 
   // Show button if we have a deferred prompt or if we're in a supported environment
+  if (typeof window === 'undefined') return null;
+  
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
   const isDevelopment = process.env.NODE_ENV === 'development';
