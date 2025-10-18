@@ -145,6 +145,7 @@ class AuthService {
     try {
       const updateData = {
         ...updates,
+        updatedAt: new Date(),
         isProfileComplete: this.checkProfileComplete({ ...updates } as UserProfile)
       };
 
@@ -156,6 +157,12 @@ class AuthService {
           displayName: updates.displayName,
           photoURL: updates.photoURL
         });
+      }
+
+      // Refresh the profile data to update the UI
+      const updatedProfile = await this.getUserProfile(uid);
+      if (updatedProfile) {
+        this.updateState({ profile: updatedProfile });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred';

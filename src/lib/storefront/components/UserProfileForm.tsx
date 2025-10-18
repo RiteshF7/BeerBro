@@ -17,7 +17,7 @@ interface UserProfileFormProps {
 export function UserProfileForm({ user, onComplete, onSkip }: UserProfileFormProps) {
   const [formData, setFormData] = useState({
     displayName: user.displayName || '',
-    phone: '',
+    phone: '+91 ',
     dateOfBirth: '',
     email: user.email || ''
   });
@@ -115,7 +115,7 @@ export function UserProfileForm({ user, onComplete, onSkip }: UserProfileFormPro
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="+1 (555) 123-4567"
+                placeholder="+91 98765 43210"
                 className={errors.phone ? 'border-red-500' : ''}
               />
               {errors.phone && (

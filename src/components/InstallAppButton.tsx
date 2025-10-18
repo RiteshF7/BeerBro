@@ -60,9 +60,17 @@ export default function InstallAppButton({
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      // In development mode, show a mock installation
-      console.log('Install button clicked - PWA install prompt not available (development mode)');
-      alert('PWA install prompt not available in this browser context. In production, this would trigger the native install prompt.');
+      // Check if we're in a supported browser
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+      
+      if (isIOS && !isInStandaloneMode) {
+        alert('To install this app on iOS, tap the Share button and then "Add to Home Screen".');
+        return;
+      }
+      
+      // For other browsers, show instructions
+      alert('Install prompt not available. Please use your browser\'s menu to "Install App" or "Add to Home Screen".');
       return;
     }
 
@@ -73,6 +81,7 @@ export default function InstallAppButton({
       
       if (outcome === 'accepted') {
         console.log('PWA installed successfully');
+        setIsInstalled(true);
       } else {
         console.log('PWA installation dismissed');
       }
@@ -80,6 +89,7 @@ export default function InstallAppButton({
       setDeferredPrompt(null);
     } catch (error) {
       console.error('Error installing PWA:', error);
+      alert('Failed to install app. Please try again or use your browser menu to install.');
     } finally {
       setIsInstalling(false);
     }
@@ -90,18 +100,27 @@ export default function InstallAppButton({
     return null;
   }
 
-  // For testing purposes, always show the button in development
+  // Show button if we have a deferred prompt or if we're in a supported environment
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
   const isDevelopment = process.env.NODE_ENV === 'development';
-  const shouldShow = deferredPrompt || isDevelopment;
+  
+  // Show button if:
+  // 1. We have a deferred prompt (Chrome/Edge)
+  // 2. We're on iOS and not in standalone mode
+  // 3. We're in development mode
+  const shouldShow = deferredPrompt || (isIOS && !isInStandaloneMode) || isDevelopment;
 
   console.log('InstallAppButton render:', { 
     isDevelopment, 
     deferredPrompt: !!deferredPrompt, 
+    isIOS,
+    isInStandaloneMode,
     shouldShow, 
     isInstalled 
   });
 
-  // Don't show if no install prompt available (except in development)
+  // Don't show if no install prompt available and not in supported environment
   if (!shouldShow) {
     console.log('InstallAppButton: Not showing button');
     return null;

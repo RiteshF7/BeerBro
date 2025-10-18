@@ -22,7 +22,7 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     displayName: '',
     email: '',
-    phone: '',
+    phone: '+91 ',
     dateOfBirth: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -253,7 +253,7 @@ export default function ProfilePage() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+91 98765 43210"
                       className={errors.phone ? 'border-red-500' : ''}
                     />
                     {errors.phone && (
